@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+
+    <style>
+        @font-face {
+          font-family: "PixelFont";  /* Custom Font Name */
+          src: url("./fonts/pixel-font.ttf") format("truetype"); /* Path to font file */
+        }
+      </style>
+      
+
+    <title>Modèle</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <link href="./src/css/styles.css" rel="stylesheet">
+
+    <script src="./src/js/libs/phaser.min.js"></script>
+
+    <script src="./src/js/scenes/Accueil.js"></script>
+    <script src="./src/js/scenes/Jeu.js"></script>
+    <script src="./src/js/scenes/Comment Jouer.js"></script>
+    <script src="./src/js/scenes/Credits.js"></script>
+    <script src="./src/js/scenes/PartieTerminee.js"></script>
+    <script src="./src/js/scenes/Victoire.js"></script>
+    <script src="./src/js/scenes/Controles.js"></script>
+    <script src="./src/js/scenes/HighScoresScene.js"></script>
+
+
+    <script src="./src/js/index.js"></script>
+
+    <style>
+        body * {
+            cursor: url('./images/Cross.png'), auto !important;
+        }
+
+        body {
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #282c34;
+            margin: 0;
+        }
+
+        .pixelated-logo {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 100px;
+            color: purple;
+            text-transform: uppercase;
+            letter-spacing: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Game Container -->
+    <div id="gameContainer"></div>
+</body>
+
+</html>

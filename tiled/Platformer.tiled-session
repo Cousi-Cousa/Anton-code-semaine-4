@@ -1,0 +1,75 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "E:/INTERACTIVITE-LUDIQUE/Platformer/maps/test1.json",
+    "expandedProjectPaths": [
+    ],
+    "file.lastUsedOpenFilter": "All Files (*)",
+    "fileStates": {
+        "": {
+            "scaleInDock": 3,
+            "scaleInEditor": 3
+        },
+        "E:/INTERACTIVITE-LUDIQUE/Platformer/maps/test1.json": {
+            "scale": 3,
+            "selectedLayer": 4,
+            "viewCenter": {
+                "x": 359.49999999999994,
+                "y": 394
+            }
+        },
+        "E:/INTERACTIVITE-LUDIQUE/Platformer/maps/test1.json#Tileset": {
+            "scaleInDock": 1.5
+        },
+        "E:/INTERACTIVITE-LUDIQUE/Platformer/maps/test1.json#fruit": {
+            "scaleInDock": 3
+        },
+        "E:/INTERACTIVITE-LUDIQUE/Platformer/maps/test1.json#heart": {
+            "scaleInEditor": 1
+        },
+        "E:/INTERACTIVITE-LUDIQUE/Platformer/maps/test1.json#platforms": {
+            "scaleInDock": 4
+        },
+        "E:/INTERACTIVITE-LUDIQUE/Platformer/maps/test1.tmx": {
+            "scale": 2,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 268,
+                "y": 176.5
+            }
+        },
+        "E:/INTERACTIVITE-LUDIQUE/Platformer/maps/test1.tmx#Tileset": {
+            "scaleInDock": 1.5
+        },
+        "E:/INTERACTIVITE-LUDIQUE/Platformer/maps/test1.tmx#fruit": {
+            "scaleInDock": 3
+        },
+        "E:/INTERACTIVITE-LUDIQUE/Platformer/maps/test1.tmx#platforms": {
+            "scaleInDock": 4
+        }
+    },
+    "last.exportedFilePath": "E:/INTERACTIVITE-LUDIQUE/Platformer/maps",
+    "last.imagePath": "E:/INTERACTIVITE-LUDIQUE/Platformer/sprites",
+    "map.height": 60,
+    "map.lastUsedExportFilter": "All Files (*)",
+    "map.lastUsedFormat": "json",
+    "map.tileHeight": 16,
+    "map.tileWidth": 16,
+    "map.width": 180,
+    "openFiles": [
+        "E:/INTERACTIVITE-LUDIQUE/Platformer/maps/test1.json"
+    ],
+    "project": "Platformer.tiled-project",
+    "property.type": "bool",
+    "recentFiles": [
+        "E:/INTERACTIVITE-LUDIQUE/Platformer/maps/test1.json",
+        "E:/INTERACTIVITE-LUDIQUE/Platformer/maps/test1.tmx"
+    ],
+    "tileset.embedInMap": true,
+    "tileset.tileSize": {
+        "height": 48,
+        "width": 16
+    }
+}
