@@ -650,21 +650,7 @@ class Jeu extends Phaser.Scene {
     }
 
 
-
-
-
-    update() {
-
-        if (this.player.isDead) return; // Stop update loop if player is dead
-
-        // Update UI
-        this.hpBar.setPosition(this.player.x, this.player.y - 40);
-
-        if (this.questTextFollow) {
-            this.questText.setPosition(this.player.x, this.player.y - 30);
-        }
-
-
+    updatePlayer() {
         // INPUTS
         // ------------------------------------------------------
 
@@ -814,33 +800,7 @@ class Jeu extends Phaser.Scene {
                 console.log("Attack animation complete");
             });
 
-
-            //return; // Prevent other animations from interrupting the attack
         }
-
-
-        /*
-        // THIS SEEMS REDUNDENT
-              if (attack && this.canAttack) {
-                  this.canAttack = false; // Prevent spamming attack
-                  this.isAttacking = true;
-                  this.player.setVelocityX(0); // Stop movement when attacking
-      
-                  console.log("✅ Attacking!");
-                  this.player.play("attack", true);
-      
-      
-                  // **Play attack sound only once per attack**
-                  this.sound.play("attackSound", { volume: 1.5 }); // Adjust volume if needed
-      
-                  // Reset attack after animation completes
-                  this.player.once("animationcomplete", () => {
-                      this.isAttacking = false;
-                      this.canAttack = true; // Allow next attack
-                      this.player.play("idle", true); // Reset to idle
-                  });
-              }
-      */
 
         // Player attack frames
         if (this.player.anims.currentAnim && this.player.anims.currentAnim.key === "attack") {
@@ -877,35 +837,41 @@ class Jeu extends Phaser.Scene {
             }
 
         }
+    }
+
+    updateUI() {
 
 
+        // Update UI
+        this.hpBar.setPosition(this.player.x, this.player.y - 40);
 
-        // ENEMIES
+        if (this.questTextFollow) {
+            this.questText.setPosition(this.player.x, this.player.y - 30);
+        }
+    }
+
+    updateCamera() {
+        // CAMERA
         // ------------------------------------------------------
-        /*
-                this.slimes.children.iterate((slime) => {
-                    if (slime.body.blocked.left) {
-                        slime.direction = 1;  // Move right if hitting the left wall
-                    }
-                    if (slime.body.blocked.right) {
-                        slime.direction = -1; // Move left if hitting the right wall
-                    }
-        
-                    // Patrol within range from homeX
-                    if (slime.x > slime.homeX + slime.patrolRange) {
-                        slime.direction = -1;  // Move left
-                    }
-                    if (slime.x < slime.homeX - slime.patrolRange) {
-                        slime.direction = 1;   // Move right
-                    }
-        
-                    slime.setVelocityX(slime.speed * slime.direction);
-                    slime.setSize(35, 20);     // (width, height) — adjust as needed
-                    slime.setOffset(30, 10);   // (x, y) offset — fine-tune to center hitbox
-                    slime.flipX = slime.direction === -1;  // Flip sprite when changing direction
-                });
-        */
-        // Enemy Behavior
+
+        let cameraX = this.cameras.main.scrollX;
+        let cameraY = this.cameras.main.scrollY;
+
+
+        const scrollX = this.cameras.main.scrollX;
+        [this.bg1, this.bg2, this.bg3, this.bg4, this.bg5, this.bg6, this.bg7, this.bg8, this.bg9, this.bg10, this.bg11, this.bg12].forEach((bg, index) => {
+            bg.x = scrollX * (0.09 + index * 0.01);
+        });
+
+
+    }
+
+
+    // ENEMIES
+    // ------------------------------------------------------
+    updateEnnemies() {
+
+
         this.enemies.children.iterate((enemy) => {
 
             if (enemy.hp > 0) {
@@ -954,22 +920,18 @@ class Jeu extends Phaser.Scene {
             }
 
         });
+    }
 
-        // CAMERA
-        // ------------------------------------------------------
+    update() {
 
-        let cameraX = this.cameras.main.scrollX;
-        let cameraY = this.cameras.main.scrollY;
+        this.updatePlayer();
 
+        this.updateEnnemies();
 
-        const scrollX = this.cameras.main.scrollX;
-        [this.bg1, this.bg2, this.bg3, this.bg4, this.bg5, this.bg6, this.bg7, this.bg8, this.bg9, this.bg10, this.bg11, this.bg12].forEach((bg, index) => {
-            bg.x = scrollX * (0.09 + index * 0.01);
-        });
+        this.updateUI();
+
+        this.updateCamera();
 
 
     }
-
-
-
 }
