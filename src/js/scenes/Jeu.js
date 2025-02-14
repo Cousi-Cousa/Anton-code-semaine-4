@@ -94,9 +94,6 @@ class Jeu extends Phaser.Scene {
 
     create() {
 
-
-
-
         // Debugging (Hidden by Default)
         this.debugGraphics = this.add.graphics().setVisible(true);
         this.physics.world.createDebugGraphic().setVisible(true);
@@ -108,8 +105,6 @@ class Jeu extends Phaser.Scene {
         const tileset = map.addTilesetImage("Tileset", "Tileset");
         const tileset1 = map.addTilesetImage("tileset_1", "tileset_1"); // New tileset
         const platformTileset = map.addTilesetImage("platforms", "platforms");
-
-
 
         // Apply tilesets to layers
         map.createLayer("sky", tileset, 0, 0);
@@ -131,17 +126,6 @@ class Jeu extends Phaser.Scene {
         // Set World and Camera Bounds
         this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
         this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
-
-        this.input.gamepad.on('connected', (pad) => {
-            console.log("🎮 Gamepad Connected:", pad.id);
-        });
-
-
-        // Enable gamepad input
-        this.input.gamepad.once('connected', (pad) => {
-            this.pad = pad; // Store the connected gamepad
-            console.log("🎮 Gamepad Connected:", this.pad.id);
-        });
 
 
         // Create the Player
@@ -244,21 +228,6 @@ class Jeu extends Phaser.Scene {
         }, null, this);
 
 
-
-
-
-        // -------------------- 🎮 Input Handling --------------------
-        this.attackKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
-        this.cursors = this.input.keyboard.addKeys({
-            left: Phaser.Input.Keyboard.KeyCodes.A,
-            right: Phaser.Input.Keyboard.KeyCodes.D,
-            jump: Phaser.Input.Keyboard.KeyCodes.SPACE,
-            attack: Phaser.Input.Keyboard.KeyCodes.E
-
-        });
-
-
-
         // --------------------  item group --------------------
         this.items = this.physics.add.group();
         const itemsLayer = map.getObjectLayer("items");
@@ -303,9 +272,6 @@ class Jeu extends Phaser.Scene {
         } else {
             console.error("Layer 'questitem' not found in Tiled map.");
         }
-
-
-
 
         // ---------------- Inventory Initialization ----------------
         this.inventory = {
@@ -393,10 +359,6 @@ class Jeu extends Phaser.Scene {
             });
         });
 
-
-
-
-
         // Create background layers with lower depth (behind everything)
         this.bg1 = this.add.image(0, 0, "bg1").setOrigin(0, 0).setDepth(-10);
         this.bg2 = this.add.image(0, 0, "bg2").setOrigin(0, 0).setDepth(-9);
@@ -472,7 +434,22 @@ class Jeu extends Phaser.Scene {
         this.collectedQuestItems = 0; // Tracks collected quest items
 
 
+        // -------------------- 🎮 Input Handling --------------------
+        // Input Handling
+        this.inputHandler = {
+            cursors: this.input.keyboard.createCursorKeys(),
+            keys: this.input.keyboard.addKeys({
+                jump: Phaser.Input.Keyboard.KeyCodes.SPACE,
+                attack: Phaser.Input.Keyboard.KeyCodes.Z
+            }),
+            gamepad: null
+        };
 
+        // Listen for gamepad connection
+        this.input.gamepad.once("connected", (pad) => {
+            this.inputHandler.gamepad = pad;
+            console.log("🎮 Gamepad Connected:", pad.id);
+        });
 
     }
 
@@ -484,8 +461,6 @@ class Jeu extends Phaser.Scene {
             console.warn("Missing HP texture:", textureKey);
         }
     }
-
-
 
 
     triggerEnding() {
@@ -503,9 +478,6 @@ class Jeu extends Phaser.Scene {
             this.endingTriggered = false; // ✅ Reset flag when changing scene
         });
     }
-
-
-
 
 
     collectPotion(player, potion) {
@@ -634,12 +606,6 @@ class Jeu extends Phaser.Scene {
         }
     }
 
-
-
-
-
-
-
     damageEnemy(enemy) {
         if (!enemy.isHit) {
             enemy.hp--; // Reduce enemy HP
@@ -680,104 +646,201 @@ class Jeu extends Phaser.Scene {
     }
 
 
-    
 
 
 
     update() {
+
+        if (this.player.isDead) return; // Stop update loop if player is dead
+
+        // Update UI
         this.hpBar.setPosition(this.player.x, this.player.y - 40);
-
-
 
         if (this.questTextFollow) {
             this.questText.setPosition(this.player.x, this.player.y - 30);
         }
 
-        if (!this.cursors) return; // Prevent crashes if cursors are not initialized
 
-        // Ensure gamepad is detected
-        if (this.input.gamepad.total > 0 && !this.pad) {
-            this.pad = this.input.gamepad.getPad(0);
-            console.log("✅ Gamepad connected:", this.pad.id);
-        }
+        // INPUTS
+        // ------------------------------------------------------
 
         // Read existing movement inputs
-        let moveLeft = false;
-        let moveRight = false;
         let jump = false;
         let attack = false;
 
-        // 🎮 Read Joystick X-Axis for movement (acts like A & D keys)
-        if (this.pad && this.pad.axes.length > 0) {
-            let joystickX = this.pad.axes[0].getValue(); // Get joystick X value
+        const { cursors, keys, gamepad } = this.inputHandler;
 
-            if (joystickX < -0.4) {
-                moveLeft = true;
-                moveRight = false;
-            } else if (joystickX > 0.4) {
-                moveRight = true;
-                moveLeft = false;
+        // Movement: Left / Right (Keyboard or Gamepad)
+        let moveLeft = cursors.left.isDown || (gamepad && gamepad.axes[0].getValue() < -0.5);
+        let moveRight = cursors.right.isDown || (gamepad && gamepad.axes[0].getValue() > 0.5);
+
+        // Jump: Use JustDown() for keyboard and check gamepad button (Button A = index 0)
+        if (Phaser.Input.Keyboard.JustDown(keys.jump) || (gamepad && gamepad.buttons[0].pressed)) {
+            console.log("Jump input");
+            jump = true;
+        }
+
+        // Attack: Use JustDown() for better control (Button B = index 1)
+        if (Phaser.Input.Keyboard.JustDown(keys.attack) || (gamepad && gamepad.buttons[1].pressed)) {
+            attack = true;
+            console.log("Attack input");
+        }
+
+
+        // If the player is not currently attacking
+        if (this.player.anims.currentAnim.key !== "attack") {
+
+            // MOVE
+            // ------------------------------------------------------
+
+            // Handle turnaround animation
+            if ((moveLeft && this.lastDirection === "right") || (moveRight && this.lastDirection === "left")) {
+                this.isTurning = true;
+                this.player.setVelocityX(0);
+                this.player.play("turnaround", true);
+                this.player.once("animationcomplete", () => {
+                    this.isTurning = false;
+                    this.lastDirection = moveLeft ? "left" : "right";
+                });
+            }
+
+            // Ensure a walk sound variable exists
+            if (!this.walkSound) {
+                this.walkSound = this.sound.add("walkSound", { loop: true, volume: 0.6 });
+            }
+
+            // Handle movement (Allowing movement both on the ground and in the air)
+            if (moveLeft || moveRight) {
+                let speed = this.player.body.blocked.down ? 120 : 80; // Slower movement in the air
+                this.player.setVelocityX(moveLeft ? -speed : speed);
+                this.player.flipX = moveLeft;
+                this.lastDirection = moveLeft ? "left" : "right";
+
+                if (this.player.body.blocked.down) {
+                    this.player.play("run", true);
+                    if (!this.walkSound.isPlaying) {
+                        this.walkSound.play();
+                    }
+                }
             } else {
-                moveLeft = false;
-                moveRight = false;
+                if (this.player.body.blocked.down) {
+                    this.player.setVelocityX(0);
+                    this.player.play("idle", true);
+                    if (this.walkSound.isPlaying) {
+                        this.walkSound.stop();
+                    }
+                }
             }
+
+            // Keep hitbox aligned when idle
+            this.player.body.setOffset(this.lastDirection === "left" ? 50 : 40, 40);
+
+            // JUMP
+            // ------------------------------------------------------
+
+            // 🎵 **Stop walk sound when the player is in the air**
+            if (!this.player.body.blocked.down && this.walkSound.isPlaying) {
+                this.walkSound.stop();
+            }
+
+            // Jumping logic
+            if (jump && this.player.body.blocked.down) {
+                this.player.setVelocityY(-340);
+                this.player.play("jump", true);
+                console.log("Start jump animation");
+                // Play jump sound effect
+                this.sound.play("jumpSound", { volume: 1.5 }); // Adjust volume if needed
+            }
+
+            // LAND
+            // ------------------------------------------------------
+
+            // Track if the player was in the air before landing
+            if (!this.player.body.blocked.down && this.player.body.velocity.y > 200) {
+                this.wasInAir = true; // Mark that the player is falling
+            }
+
+            // Play landing sound only once when landing
+            if (this.wasInAir && this.player.body.blocked.down) {
+                if (!this.landedRecently) {  // Prevent multiple triggers
+                    this.sound.play("landingSound", { volume: 1.5 });
+                    this.landedRecently = true;
+
+                    // Reset the flag after a short delay
+                    this.time.delayedCall(100, () => {
+                        this.landedRecently = false;
+                    });
+                }
+
+                this.wasInAir = false; // Reset air state
+            }
+
+            // **In-Between Jump/Fall Logic**
+            if (this.player.body.velocity.y > 0 && this.player.body.velocity.y < 200) {
+                this.player.play("jump_fall_transition", true);
+            }
+
         }
 
-        // 🎮 Read Gamepad Buttons (0 = Jump, 1 = Attack)
-        if (this.pad && this.pad.buttons.length > 1) {
-            if (this.pad.buttons[0].pressed) { // Button 0 for Jump (acts like Space)
-                jump = true;
-            }
+        // ATTACK
+        // ------------------------------------------------------
+        //
 
-            if (this.pad.buttons[1].pressed) { // Button 1 for Attack (acts like E)
-                attack = true;
-            }
-        }
-
-        // Apply movement (joystick acting like A & D keys)
-        this.cursors.left.isDown = moveLeft;
-        this.cursors.right.isDown = moveRight;
-
-        // Apply Jump exactly like Space bar
-        this.cursors.jump.isDown = jump;
-
-        // **Apply attack (button 1 directly triggers attack)**
+        // Trigger Attack
         if (attack && this.canAttack) {
-            this.canAttack = false; // Prevent spamming attack
-            this.isAttacking = true;
-            this.player.setVelocityX(0); // Stop movement when attacking
+            console.log("Attack triggered");
+            this.canAttack = false; // Prevent attacking again immediately
+            this.isAttacking = true; // Set attack flag
 
-            console.log("✅ Attacking!");
-            this.player.play("attack", true);
-
-
-            // **Play attack sound only once per attack**
             this.sound.play("attackSound", { volume: 1.5 }); // Adjust volume if needed
+            this.player.setVelocityX(0); // Stop movement during attack
 
-            // Reset attack after animation completes
-            this.player.once("animationcomplete", () => {
-                this.isAttacking = false;
-                this.canAttack = true; // Allow next attack
-                this.player.play("idle", true); // Reset to idle
+            // Reset attack ability after cooldown
+            /*
+            this.time.delayedCall(1000, () => { // Adjust the delay as needed
+                this.canAttack = true;
             });
+*/
+            this.player.play("attack", true);
+            // Wait until the attack animation completes before resetting attack flag
+            this.player.once("animationcomplete", () => {
+                this.isAttacking = false; // Reset attack flag
+                this.canAttack = true;
+                this.player.play("idle", true); // Go back to idle
+                console.log("Attack animation complete");
+            });
+
+
+            //return; // Prevent other animations from interrupting the attack
         }
 
 
+        /*
+        // THIS SEEMS REDUNDENT
+              if (attack && this.canAttack) {
+                  this.canAttack = false; // Prevent spamming attack
+                  this.isAttacking = true;
+                  this.player.setVelocityX(0); // Stop movement when attacking
+      
+                  console.log("✅ Attacking!");
+                  this.player.play("attack", true);
+      
+      
+                  // **Play attack sound only once per attack**
+                  this.sound.play("attackSound", { volume: 1.5 }); // Adjust volume if needed
+      
+                  // Reset attack after animation completes
+                  this.player.once("animationcomplete", () => {
+                      this.isAttacking = false;
+                      this.canAttack = true; // Allow next attack
+                      this.player.play("idle", true); // Reset to idle
+                  });
+              }
+      */
 
-
-
-
-
-
-
-
-        if (this.player.isDead) return; // Stop update loop if player is dead
-
-        // Player Attack Logic
+        // Player attack frames
         if (this.player.anims.currentAnim && this.player.anims.currentAnim.key === "attack") {
             const currentFrame = this.player.anims.currentFrame.index;
-
-
 
             // Adjust hitbox during attack frames based on facing direction
             if ([1, 2, 3].includes(currentFrame)) {
@@ -801,8 +864,6 @@ class Jeu extends Phaser.Scene {
                 }
             }
 
-
-
             // Apply damage during specific attack frames
             if ([1, 2, 3].includes(currentFrame)) {
                 this.physics.overlap(this.player, this.enemies, (player, enemy) => {
@@ -813,6 +874,10 @@ class Jeu extends Phaser.Scene {
 
         }
 
+
+
+        // ENEMIES
+        // ------------------------------------------------------
 
         this.slimes.children.iterate((slime) => {
             if (slime.body.blocked.left) {
@@ -835,10 +900,6 @@ class Jeu extends Phaser.Scene {
             slime.setOffset(30, 10);   // (x, y) offset — fine-tune to center hitbox
             slime.flipX = slime.direction === -1;  // Flip sprite when changing direction
         });
-
-
-
-
 
         // Enemy Behavior
         this.enemies.children.iterate((enemy) => {
@@ -886,7 +947,8 @@ class Jeu extends Phaser.Scene {
             }
         });
 
-
+        // CAMERA
+        // ------------------------------------------------------
 
         let cameraX = this.cameras.main.scrollX;
         let cameraY = this.cameras.main.scrollY;
@@ -897,122 +959,7 @@ class Jeu extends Phaser.Scene {
             bg.x = scrollX * (0.09 + index * 0.01);
         });
 
-        if (this.isAttacking || this.player.isInvulnerable) return;
 
-        if (Phaser.Input.Keyboard.JustDown(this.attackKey) && this.canAttack) {
-            this.canAttack = false; // Prevent attacking again immediately
-            this.isAttacking = true; // Set attack flag
-            this.player.play("attack", true);
-            this.player.setVelocityX(0); // Stop movement during attack
-
-            // Reset attack ability after cooldown
-            this.time.delayedCall(1000, () => { // Adjust the delay as needed
-                this.canAttack = true;
-            });
-
-            // Wait until the attack animation completes before resetting attack flag
-            this.player.once("animationcomplete", () => {
-                this.isAttacking = false; // Reset attack flag
-                this.player.play("idle", true); // Go back to idle
-            });
-
-            return; // Prevent other animations from interrupting the attack
-        }
-        console.log("Can attack:", this.canAttack);
-
-
-        let movingLeft = this.cursors.left.isDown;
-        let movingRight = this.cursors.right.isDown;
-
-        // Handle turnaround animation
-        if ((movingLeft && this.lastDirection === "right") || (movingRight && this.lastDirection === "left")) {
-            this.isTurning = true;
-            this.player.setVelocityX(0);
-            this.player.play("turnaround", true);
-            this.player.once("animationcomplete", () => {
-                this.isTurning = false;
-                this.lastDirection = movingLeft ? "left" : "right";
-            });
-            return;
-        }
-
-
-
-        // Ensure a walk sound variable exists
-        if (!this.walkSound) {
-            this.walkSound = this.sound.add("walkSound", { loop: true, volume: 0.6 });
-        }
-
-        // Handle movement (Allowing movement both on the ground and in the air)
-        if (movingLeft || movingRight) {
-            let speed = this.player.body.blocked.down ? 120 : 80; // Slower movement in the air
-            this.player.setVelocityX(movingLeft ? -speed : speed);
-            this.player.flipX = movingLeft;
-            this.lastDirection = movingLeft ? "left" : "right";
-
-            if (this.player.body.blocked.down) {
-                this.player.play("run", true);
-                if (!this.walkSound.isPlaying) {
-                    this.walkSound.play();
-                }
-            }
-        } else {
-            if (this.player.body.blocked.down) {
-                this.player.setVelocityX(0);
-                this.player.play("idle", true);
-                if (this.walkSound.isPlaying) {
-                    this.walkSound.stop();
-                }
-            }
-        }
-        // Keep hitbox aligned when idle
-        this.player.body.setOffset(this.lastDirection === "left" ? 50 : 40, 40);
-
-        // 🎵 **Stop walk sound when the player is in the air**
-        if (!this.player.body.blocked.down && this.walkSound.isPlaying) {
-            this.walkSound.stop();
-        }
-
-
-
-
-
-        // Jumping logic
-        if (this.cursors.jump.isDown && this.player.body.blocked.down) {
-            this.player.setVelocityY(-340);
-            this.player.play("jump", true);
-            // Play jump sound effect
-            this.sound.play("jumpSound", { volume: 1.5 }); // Adjust volume if needed
-        }
-
-
-        // Track if the player was in the air before landing
-        if (!this.player.body.blocked.down && this.player.body.velocity.y > 200) {
-            this.wasInAir = true; // Mark that the player is falling
-        }
-
-        // Play landing sound only once when landing
-        if (this.wasInAir && this.player.body.blocked.down) {
-            if (!this.landedRecently) {  // Prevent multiple triggers
-                this.sound.play("landingSound", { volume: 1.5 });
-                this.landedRecently = true;
-
-                // Reset the flag after a short delay
-                this.time.delayedCall(100, () => {
-                    this.landedRecently = false;
-                });
-            }
-
-            this.wasInAir = false; // Reset air state
-        }
-
-
-
-
-        // **In-Between Jump/Fall Logic**
-        if (this.player.body.velocity.y > 0 && this.player.body.velocity.y < 200) {
-            this.player.play("jump_fall_transition", true);
-        }
     }
 
 
