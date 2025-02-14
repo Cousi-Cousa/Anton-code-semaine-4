@@ -617,19 +617,23 @@ class Jeu extends Phaser.Scene {
             if (enemy.hp <= 0 && !enemy.isDead) {
                 enemy.isDead = true;
 
+                console.log("Enemy dies");
+
 
                 // BUG
 
                 // ✅ **Force Death Animation Immediately**
                 enemy.anims.stop();  // Stops all current animations
                 enemy.setVelocity(0); // Ensures the enemy stops moving
-                enemy.play("enemy_death", true); // Forces death animation
+
 
                 // ✅ Remove hitbox & disable physics body
                 enemy.body.setEnable(false);
 
+                enemy.play("enemy_death", true); // Forces death animation
                 // ⏳ **Wait until animation is complete, then remove enemy**
                 enemy.once("animationcomplete", () => {
+                    console.log("Enemy death animation done");
                     enemy.destroy();
                 });
 
@@ -878,73 +882,77 @@ class Jeu extends Phaser.Scene {
 
         // ENEMIES
         // ------------------------------------------------------
-
-        this.slimes.children.iterate((slime) => {
-            if (slime.body.blocked.left) {
-                slime.direction = 1;  // Move right if hitting the left wall
-            }
-            if (slime.body.blocked.right) {
-                slime.direction = -1; // Move left if hitting the right wall
-            }
-
-            // Patrol within range from homeX
-            if (slime.x > slime.homeX + slime.patrolRange) {
-                slime.direction = -1;  // Move left
-            }
-            if (slime.x < slime.homeX - slime.patrolRange) {
-                slime.direction = 1;   // Move right
-            }
-
-            slime.setVelocityX(slime.speed * slime.direction);
-            slime.setSize(35, 20);     // (width, height) — adjust as needed
-            slime.setOffset(30, 10);   // (x, y) offset — fine-tune to center hitbox
-            slime.flipX = slime.direction === -1;  // Flip sprite when changing direction
-        });
-
+        /*
+                this.slimes.children.iterate((slime) => {
+                    if (slime.body.blocked.left) {
+                        slime.direction = 1;  // Move right if hitting the left wall
+                    }
+                    if (slime.body.blocked.right) {
+                        slime.direction = -1; // Move left if hitting the right wall
+                    }
+        
+                    // Patrol within range from homeX
+                    if (slime.x > slime.homeX + slime.patrolRange) {
+                        slime.direction = -1;  // Move left
+                    }
+                    if (slime.x < slime.homeX - slime.patrolRange) {
+                        slime.direction = 1;   // Move right
+                    }
+        
+                    slime.setVelocityX(slime.speed * slime.direction);
+                    slime.setSize(35, 20);     // (width, height) — adjust as needed
+                    slime.setOffset(30, 10);   // (x, y) offset — fine-tune to center hitbox
+                    slime.flipX = slime.direction === -1;  // Flip sprite when changing direction
+                });
+        */
         // Enemy Behavior
         this.enemies.children.iterate((enemy) => {
-            const distanceToPlayer = Phaser.Math.Distance.Between(this.player.x, this.player.y, enemy.x, enemy.y);
 
-            if (enemy.isAttacking === undefined) {
-                enemy.isAttacking = false;
-            }
+            if (enemy.hp > 0) {
+                const distanceToPlayer = Phaser.Math.Distance.Between(this.player.x, this.player.y, enemy.x, enemy.y);
 
-            if (distanceToPlayer < 30 && !enemy.isAttacking && !this.player.isInvulnerable) {
-                enemy.setVelocityX(0);
-                enemy.isAttacking = true;
-                enemy.play("enemy_attack", true);
-                enemy.flipX = this.player.x > enemy.x;
-
-                enemy.on("animationupdate", (anim, frame) => {
-                    if (frame.index >= 4 && frame.index <= 7 && !this.player.isInvulnerable) {
-                        if (Phaser.Math.Distance.Between(enemy.x, enemy.y, this.player.x, this.player.y) < 30) {
-                            this.dealDamage(this.player);
-
-                            // Apply faster knockback to player
-                            const knockback = 50; // Increased knockback speed
-                            const direction = (this.player.x < enemy.x) ? -1 : 1;
-                            this.player.setVelocityX(knockback * direction);
-                        }
-                    }
-                });
-
-                enemy.once("animationcomplete", () => {
+                if (enemy.isAttacking === undefined) {
                     enemy.isAttacking = false;
-                });
-            } else if (!enemy.isAttacking) {
-                if (distanceToPlayer < 100) {
-                    enemy.setVelocityX(this.player.x < enemy.x ? -50 : 50);
-                    enemy.flipX = this.player.x > enemy.x;
-                    enemy.play("enemy_run", true);
-                } else if (Math.abs(enemy.x - enemy.homeX) > 5) {
-                    enemy.setVelocityX(enemy.x > enemy.homeX ? -30 : 30);
-                    enemy.flipX = enemy.x < enemy.homeX;
-                    enemy.play("enemy_run", true);
-                } else {
+                }
+
+                if (distanceToPlayer < 30 && !enemy.isAttacking && !this.player.isInvulnerable) {
                     enemy.setVelocityX(0);
-                    enemy.play("enemy_idle", true);
+                    enemy.isAttacking = true;
+                    enemy.play("enemy_attack", true);
+                    enemy.flipX = this.player.x > enemy.x;
+
+                    enemy.on("animationupdate", (anim, frame) => {
+                        if (frame.index >= 4 && frame.index <= 7 && !this.player.isInvulnerable) {
+                            if (Phaser.Math.Distance.Between(enemy.x, enemy.y, this.player.x, this.player.y) < 30) {
+                                this.dealDamage(this.player);
+
+                                // Apply faster knockback to player
+                                const knockback = 50; // Increased knockback speed
+                                const direction = (this.player.x < enemy.x) ? -1 : 1;
+                                this.player.setVelocityX(knockback * direction);
+                            }
+                        }
+                    });
+
+                    enemy.once("animationcomplete", () => {
+                        enemy.isAttacking = false;
+                    });
+                } else if (!enemy.isAttacking) {
+                    if (distanceToPlayer < 100) {
+                        enemy.setVelocityX(this.player.x < enemy.x ? -50 : 50);
+                        enemy.flipX = this.player.x > enemy.x;
+                        enemy.play("enemy_run", true);
+                    } else if (Math.abs(enemy.x - enemy.homeX) > 5) {
+                        enemy.setVelocityX(enemy.x > enemy.homeX ? -30 : 30);
+                        enemy.flipX = enemy.x < enemy.homeX;
+                        enemy.play("enemy_run", true);
+                    } else {
+                        enemy.setVelocityX(0);
+                        enemy.play("enemy_idle", true);
+                    }
                 }
             }
+
         });
 
         // CAMERA
