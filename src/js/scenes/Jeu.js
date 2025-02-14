@@ -434,12 +434,20 @@ class Jeu extends Phaser.Scene {
         this.collectedQuestItems = 0; // Tracks collected quest items
 
 
+        // -------------- ATTACK HITBOX --------------
+        this.attackHitboxes = this.physics.add.group();
+        this.physics.add.overlap(this.attackHitboxes, this.enemies, (hitbox, enemy) => {
+            console.log("hit");
+            this.damageEnemy(enemy);
+        },null,this);
+        
+
         // -------------------- 🎮 Input Handling --------------------
         // Input Handling
         this.inputHandler = {
             cursors: this.input.keyboard.createCursorKeys(),
             keys: this.input.keyboard.addKeys({
-                jump: Phaser.Input.Keyboard.KeyCodes.SPACE,
+                jump: Phaser.Input.Keyboard.KeyCodes.X,
                 attack: Phaser.Input.Keyboard.KeyCodes.Z
             }),
             gamepad: null
@@ -742,6 +750,7 @@ class Jeu extends Phaser.Scene {
                 this.sound.play("jumpSound", { volume: 1.5 }); // Adjust volume if needed
             }
 
+
             // LAND
             // ------------------------------------------------------
 
@@ -800,43 +809,24 @@ class Jeu extends Phaser.Scene {
                 console.log("Attack animation complete");
             });
 
+            let offsetX = this.player.flipX ? -34 : 34; // Adjust for direction
+            let hitbox = this.attackHitboxes.create(this.player.x + offsetX, this.player.y+20, null);
+
+            hitbox.setSize(46, 40); // Set hitbox size
+            hitbox.setVisible(false); // Hide hitbox
+            hitbox.body.allowGravity = false; // No gravity
+            // Destroy hitbox after time
+            this.time.delayedCall(300, () => {
+                hitbox.destroy();
+            });
         }
 
-        // Player attack frames
-        if (this.player.anims.currentAnim && this.player.anims.currentAnim.key === "attack") {
-            const currentFrame = this.player.anims.currentFrame.index;
+        // MOVE HITBOXES SO THEY FOLLOW PLAYER
+        this.attackHitboxes.children.iterate((hitbox) => {
+            let offsetX = this.player.flipX ? -34 : 34; // Adjust for direction
+            hitbox.setPosition(this.player.x + offsetX, this.player.y+20);
+        });
 
-            // Adjust hitbox during attack frames based on facing direction
-            if ([1, 2, 3].includes(currentFrame)) {
-                if (this.player.flipX) {
-                    // Facing LEFT
-                    this.player.body.setSize(80, 40);     // Widen the hitbox
-                    this.player.body.setOffset(0, 40);   // Shift hitbox towards the left
-                } else {
-                    // Facing RIGHT
-                    this.player.body.setSize(80, 40);     // Widen the hitbox
-                    this.player.body.setOffset(40, 40);   // Shift hitbox towards the right
-                }
-            } else {
-                // Reset hitbox to default size after attack frames
-                if (this.player.flipX) {
-                    this.player.body.setSize(30, 40);
-                    this.player.body.setOffset(50, 40);   // Default offset for LEFT
-                } else {
-                    this.player.body.setSize(30, 40);
-                    this.player.body.setOffset(40, 40);   // Default offset for RIGHT
-                }
-            }
-
-            // Apply damage during specific attack frames
-            if ([1, 2, 3].includes(currentFrame)) {
-                this.physics.overlap(this.player, this.enemies, (player, enemy) => {
-                    this.damageEnemy(enemy);
-                });
-
-            }
-
-        }
     }
 
     updateUI() {
