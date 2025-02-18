@@ -159,6 +159,8 @@ class Jeu extends Phaser.Scene {
     this.load.audio("damageSound", "sounds/Damage.wav");
     this.load.audio("questSound", "sounds/QuestPickUp.wav");
     this.load.audio("walkSound", "sounds/Walk.wav");
+    this.load.audio("enemyHit", "sounds/blessure_ennemi_reaper.wav");
+    this.load.audio("enemyDeath", "sounds/mort_ennemi_reaper.wav");
   }
 
   create() {
@@ -858,6 +860,7 @@ class Jeu extends Phaser.Scene {
     if (!enemy.isHit) {
       enemy.hp--; // Reduce enemy HP
       enemy.isHit = true; // Prevent rapid damage
+      this.sound.play("enemyHit", { volume: 1.5 });
 
       console.log(`Enemy HP: ${enemy.hp}`);
 
@@ -877,6 +880,8 @@ class Jeu extends Phaser.Scene {
         enemy.body.setEnable(false);
 
         enemy.play("enemy_death", true); // Forces death animation
+
+        this.sound.play("enemyDeath", { volume: 1.5 });
         // ⏳ **Wait until animation is complete, then remove enemy**
         enemy.once("animationcomplete", () => {
           console.log("Enemy death animation done");
@@ -952,7 +957,7 @@ class Jeu extends Phaser.Scene {
       if (!this.walkSound) {
         this.walkSound = this.sound.add("walkSound", {
           loop: true,
-          volume: 0.6,
+          volume: 0.3,
         });
       }
 
