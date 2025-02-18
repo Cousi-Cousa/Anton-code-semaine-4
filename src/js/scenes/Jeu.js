@@ -733,6 +733,7 @@ class Jeu extends Phaser.Scene {
 
   collectPotion(player, potion) {
     if (!potion.getData("collected")) {
+      this.sound.play("potionSound", { volume: 2 }); // Play potion pickup sound
       potion.setData("collected", true);
       potion.destroy(); // Remove from scene
 
@@ -740,7 +741,6 @@ class Jeu extends Phaser.Scene {
       if (player.hp < 5) {
         player.hp++;
         this.updateHealthBar();
-        this.sound.play("potionSound", { volume: 1.2 }); // Play potion pickup sound
       }
     }
   }
