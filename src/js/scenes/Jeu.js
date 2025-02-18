@@ -159,8 +159,6 @@ class Jeu extends Phaser.Scene {
     this.load.audio("damageSound", "sounds/Damage.wav");
     this.load.audio("questSound", "sounds/QuestPickUp.wav");
     this.load.audio("walkSound", "sounds/Walk.wav");
-    this.load.audio("enemyHit", "sounds/blessure_ennemi_reaper.wav");
-    this.load.audio("enemyDeath", "sounds/mort_ennemi_reaper.wav");
   }
 
   create() {
@@ -539,43 +537,31 @@ class Jeu extends Phaser.Scene {
     );
     this.rubisText.setOrigin(0.5, 1);
     this.rubisText.setVisible(false); // Hide initially
+    
+// ---------------- ENDING ----------------
+this.physics.add.overlap(this.player, this.rubisGroup, (player, rubis) => {
+  if (this.collectedQuestItems >= 3) {
+      this.triggerEnding();
+  }
+  
 
-    this.physics.add.overlap(this.player, this.rubisGroup, (player, rubis) => {
-      if (
-        this.collectedQuestItems >= 3 &&
-        this.pad &&
-        this.pad.buttons[1].pressed
-      ) {
-        this.triggerEnding();
-      }
 
-      let message = "Un Rubis Ancien..."; // Default message
+      
 
-      if (this.collectedQuestItems > 0) {
+    // Show a message based on how many quest items have been collected
+    let message = "Un Rubis Ancien...";
+    if (this.collectedQuestItems > 0) {
         message = `Vous avez trouvé ${this.collectedQuestItems} pièce(s) du Rubis !`;
-      }
-
-      if (
-        this.questItemsCollected >= 3 &&
-        Phaser.Geom.Intersects.RectangleToRectangle(
-          this.player.getBounds(),
-          this.rubis.getBounds()
-        )
-      ) {
-        this.triggerEnding();
-      }
-
-      this.endingTriggered = false;
-
+    }
       this.rubisText.setText(message);
-      this.rubisText.setPosition(this.player.x, this.player.y - 30); // Position above player
-      this.rubisText.setVisible(true); // Show text
-
+      this.rubisText.setPosition(this.player.x, this.player.y - 30);
+      this.rubisText.setVisible(true);
+  
       // Hide text after 2 seconds
       this.time.delayedCall(2000, () => {
-        this.rubisText.setVisible(false);
+          this.rubisText.setVisible(false);
       });
-    });
+  });
 
     // Create background layers with lower depth (behind everything)
     this.bg1 = this.add.image(0, 0, "bg1").setOrigin(0, 0).setDepth(-10);
@@ -691,19 +677,6 @@ class Jeu extends Phaser.Scene {
       this.inputHandler.gamepad = pad;
       console.log("🎮 Gamepad Connected:", pad.id);
     });
-    
-    this.input.once("pointerdown", () => {
-      if (this.sound.context.state === "suspended") {
-          this.sound.context.resume();
-      }
-  }, this);
-  
-  this.input.keyboard.once("keydown", () => {
-      if (this.sound.context.state === "suspended") {
-          this.sound.context.resume();
-      }
-  }, this);
-  
   }
 
   updateHealthBar() {
@@ -733,7 +706,6 @@ class Jeu extends Phaser.Scene {
 
   collectPotion(player, potion) {
     if (!potion.getData("collected")) {
-      this.sound.play("potionSound", { volume: 2 }); // Play potion pickup sound
       potion.setData("collected", true);
       potion.destroy(); // Remove from scene
 
@@ -741,6 +713,7 @@ class Jeu extends Phaser.Scene {
       if (player.hp < 5) {
         player.hp++;
         this.updateHealthBar();
+        this.sound.play("potionSound", { volume: 1.2 }); // Play potion pickup sound
       }
     }
   }
@@ -860,7 +833,6 @@ class Jeu extends Phaser.Scene {
     if (!enemy.isHit) {
       enemy.hp--; // Reduce enemy HP
       enemy.isHit = true; // Prevent rapid damage
-      this.sound.play("enemyHit", { volume: 1.5 });
 
       console.log(`Enemy HP: ${enemy.hp}`);
 
@@ -880,8 +852,6 @@ class Jeu extends Phaser.Scene {
         enemy.body.setEnable(false);
 
         enemy.play("enemy_death", true); // Forces death animation
-
-        this.sound.play("enemyDeath", { volume: 1.5 });
         // ⏳ **Wait until animation is complete, then remove enemy**
         enemy.once("animationcomplete", () => {
           console.log("Enemy death animation done");
@@ -957,7 +927,7 @@ class Jeu extends Phaser.Scene {
       if (!this.walkSound) {
         this.walkSound = this.sound.add("walkSound", {
           loop: true,
-          volume: 0.3,
+          volume: 0.6,
         });
       }
 
@@ -1052,7 +1022,7 @@ class Jeu extends Phaser.Scene {
 
       // Reset attack ability after cooldown
       
-            this.time.delayedCall(500, () => { // Adjust the delay as needed
+            this.time.delayedCall(600, () => { // Adjust the delay as needed
                 this.canAttack = true;
             });
 
@@ -1197,11 +1167,14 @@ class Jeu extends Phaser.Scene {
   update() {
     this.updatePlayer();
 
+
+
     this.updateEnnemies();
 
     this.updateUI();
 
     this.updateCamera();
+    
 
     if (this.inputHandler.gamepad == null) {
       if (this.input.gamepad.gamepads.length > 0) {
