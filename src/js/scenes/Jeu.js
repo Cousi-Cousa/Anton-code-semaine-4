@@ -677,6 +677,9 @@ this.physics.add.overlap(this.player, this.rubisGroup, (player, rubis) => {
       this.inputHandler.gamepad = pad;
       console.log("🎮 Gamepad Connected:", pad.id);
     });
+
+
+    this.endingTriggered = false;
   }
 
   updateHealthBar() {
@@ -1060,7 +1063,8 @@ this.physics.add.overlap(this.player, this.rubisGroup, (player, rubis) => {
 
   updateUI() {
     // Update UI
-    this.hpBar.setPosition(this.player.x, this.player.y - 40);
+    this.hpBar.setPosition(762, 544);
+    //console.log(this.player.x, this.player.y - 40);
 
     if (this.questTextFollow) {
       this.questText.setPosition(this.player.x, this.player.y - 30);

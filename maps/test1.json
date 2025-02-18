@@ -18,6 +18,18 @@
                  "width":32,
                  "x":3104,
                  "y":592
+                }, 
+                {
+                 "gid":581,
+                 "height":96,
+                 "id":247,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":868,
+                 "y":620
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -337,6 +349,17 @@
                  "width":0,
                  "x":1040,
                  "y":564
+                }, 
+                {
+                 "height":0,
+                 "id":251,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":580,
+                 "y":572
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -439,6 +462,39 @@
                  "width":16,
                  "x":4760,
                  "y":632
+                }, 
+                {
+                 "height":0,
+                 "id":248,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":796,
+                 "y":600
+                }, 
+                {
+                 "height":0,
+                 "id":249,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":740,
+                 "y":600
+                }, 
+                {
+                 "height":0,
+                 "id":250,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":684,
+                 "y":600
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -447,7 +503,7 @@
          "y":0
         }],
  "nextlayerid":22,
- "nextobjectid":247,
+ "nextobjectid":252,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
