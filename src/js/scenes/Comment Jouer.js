@@ -10,67 +10,61 @@ class CommentJouer extends Phaser.Scene {
         this.load.image('btnBackDark', './images/Back  col_Button_Dark.png');
         this.load.image('btnKeys', './images/Keys.png');
         this.load.image('btnKeysDark', './images/Keys_Dark.png');
-        this.load.audio('clickSound', './Sounds/retro-click-236673.mp3');
+// Sounds
+this.load.audio('clickSound', './Sounds/retro-click-236673.mp3');
+        this.load.image('texteDebut', './images/texte_debut 1.png');
     }
 
     create() {
-        // Add background and start/resume background music
-        this.add.image(710, 500, 'background').setScale(1);
-
+        // Background 
+        this.add.image(955, 537.5, 'background').setScale(1);
+    
+        // Display the "texte_debut" image
+        this.add.image(955, 540, 'texteDebut').setScale(1);
+    
         if (isAudioOn && backgroundMusic && backgroundMusic.isPaused) {
             backgroundMusic.resume();
         } else if (isAudioOn && !backgroundMusic) {
             backgroundMusic = this.sound.add('menuMusic', { volume: 0.5, loop: true });
             backgroundMusic.play();
         }
-
-        // Back button
-        const RetourBtn = this.add.image(710, 750, 'btnBack').setInteractive().setScale(1.3);
-        RetourBtn.on('pointerover', () => RetourBtn.setTexture('btnBackDark'));
-        RetourBtn.on('pointerout', () => RetourBtn.setTexture('btnBack'));
-        RetourBtn.on('pointerdown', () => {
-            if (isAudioOn) this.sound.play('clickSound');
-            this.scene.start('Accueil');
-
-        });
+        
+        // Play button with hover effect
+        const commencerBtn = this.add.image(955, 850, 'btnCommencer').setInteractive().setScale(1.3);
+        commencerBtn.on('pointerover', () => commencerBtn.setTexture('btnCommencerDark'));
+        commencerBtn.on('pointerout', () => commencerBtn.setTexture('btnCommencer'));
+        commencerBtn.on('pointerdown', () => this.scene.start('Jeu'));
+        
         this.tweens.add({
-            targets: RetourBtn,
-            y: 760,
+            targets: commencerBtn,
+            y: 860,
             duration: 1500,
             yoyo: true,
             repeat: -1,
             ease: 'Sine.easeInOut'
         });
+    
 
-        // Controls button
-        const ControlesBtn = this.add.image(710, 600, 'btnKeys').setInteractive().setScale(1.3);
-        ControlesBtn.on('pointerover', () => ControlesBtn.setTexture('btnKeysDark'));
-        ControlesBtn.on('pointerout', () => ControlesBtn.setTexture('btnKeys'));
-        ControlesBtn.on('pointerdown', () => {
-            if (isAudioOn) this.sound.play('clickSound');
-            this.scene.start('Controles');
+
+        this.cameras.main.fadeIn(1000); // 500ms fade-in effect
+
+        // ----------------- 🎮 GAMEPAD SUPPORT -----------------
+        this.input.gamepad.once('connected', (pad) => {
+            this.pad = pad;
         });
+    
+        this.input.gamepad.on('down', (pad, button) => {
+            if (button.index === 1) { // Button 1 (B on Xbox / Circle on PS)
+                console.log("✅ Gamepad button 1 pressed - Starting game!");
+                this.sound.play('clickSound'); // Play click sound
 
-        // Audio button
-        this.audioButton = this.add.image(710, 450, isAudioOn ? 'btnAudio' : 'btnAudioOff')
-            .setInteractive()
-            .setScale(1.3);
-
-        // Toggle audio state
-        this.audioButton.on('pointerdown', () => {
-            isAudioOn = !isAudioOn;
-            console.log("Audio State:", isAudioOn); // Debugging statement
-            this.sound.mute = !isAudioOn;
-
-            // Control background music based on audio state
-            if (isAudioOn) {
-                backgroundMusic.resume();
-            } else {
-                backgroundMusic.pause();
-            }
-
-            // Update button texture based on audio state
-            this.audioButton.setTexture(isAudioOn ? 'btnAudio' : 'btnAudioOff');
-        });
+                // Fade out and change scene after delay
+                this.cameras.main.fadeOut(1000);
+                this.time.delayedCall(1000, () => {
+                    this.scene.start("Jeu");
+                });
+                        
+               }
+            });
     }
-}
+} 

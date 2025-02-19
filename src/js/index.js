@@ -1,7 +1,7 @@
 const config = {
   type: Phaser.AUTO,
-  width: 1920,
-  height: 1200,
+  width: 1910,
+  height: 1075,
 
 
   input: { gamepad: true }, // Enable gamepad support

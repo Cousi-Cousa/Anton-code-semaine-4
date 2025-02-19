@@ -7,22 +7,13 @@ class Accueil extends Phaser.Scene {
         this.load.image('background', './images/Background.png');
         this.load.image('logo', './images/logo.png');
         this.load.image('btnCommencer', './images/Start.png');
-        this.load.image('btnCredits', './images/Credits.png');
-        this.load.image('btnComment', './images/Settings.png');
-        this.load.image('ScoreBtn', './images/Score.png');
-
-        // Dark mode versions of each button
         this.load.image('btnCommencerDark', './images/Start_Dark.png');
-        this.load.image('btnCreditsDark', './images/Credits_Dark.png');
-        this.load.image('btnCommentDark', './images/Settings_Dark.png');
-        this.load.image('ScoreBtnDark', './images/Score_Dark.png');
 
-        //Sounds
+        // Sounds
         this.load.audio('clickSound', './Sounds/retro-click-236673.mp3');
 
-        //Music
-
-         this.load.audio('menuMusic', './Sounds/01 - Welcome To The Wild West.mp3');
+        // Music
+        this.load.audio('menuMusic', './Sounds/01 - Welcome To The Wild West.mp3');
     }
 
     // Click sound to any button
@@ -33,23 +24,17 @@ class Accueil extends Phaser.Scene {
     }
 
     create() {
-
-
-        // background and logo
-        this.add.image(710, 500, 'background').setScale(1);
-
-
-
+        // Background and logo
+        this.add.image(955, 537.5, 'background').setScale(1);
+        
         // Store the music instance globally
         this.registry.set('menuMusic', this.menuMusic);
 
         // Create the logo
-        const logo = this.add.image(710, 200, 'logo').setScale(2);
+        const logo = this.add.image(955, 300, 'logo').setScale(2);
 
-
-        // Shine Effect to the logo
+        // Shine effect on the logo
         const shineEffect = logo.postFX.addShine(1, 0.2, 5);
-
         this.tweens.add({
             targets: shineEffect,
             intensity: { from: 0.2, to: 0.8 },
@@ -59,58 +44,32 @@ class Accueil extends Phaser.Scene {
             ease: 'Sine.easeInOut'
         });
 
-        // Animation to the logo
+        // Animation on the logo
         this.tweens.add({
             targets: logo,
-            y: 220,
+            y: 320,
             duration: 1500,
             yoyo: true,
             repeat: -1,
             ease: 'Sine.easeInOut'
         });
 
-        // Commencer button with hover effect
-        const commencerBtn = this.add.image(710, 350, 'btnCommencer').setInteractive().setScale(1.3);
+        // Play button with hover effect
+        const commencerBtn = this.add.image(955, 550, 'btnCommencer').setInteractive().setScale(1.3);
         commencerBtn.on('pointerover', () => commencerBtn.setTexture('btnCommencerDark'));
         commencerBtn.on('pointerout', () => commencerBtn.setTexture('btnCommencer'));
-        commencerBtn.on('pointerdown', () => this.scene.start('Jeu'));
+        commencerBtn.on('pointerdown', () => this.scene.start('CommentJouer')); // Go to the new intermediate scene first
         this.tweens.add({
             targets: commencerBtn,
-            y: 360,
+            y: 560,
             duration: 1500,
             yoyo: true,
             repeat: -1,
             ease: 'Sine.easeInOut'
         });
 
-
-
-        // Crédit button with hover effect
-        const creditBtn = this.add.image(710, 500, 'btnCredits').setInteractive().setScale(1.3);
-        creditBtn.on('pointerover', () => creditBtn.setTexture('btnCreditsDark'));
-        creditBtn.on('pointerout', () => creditBtn.setTexture('btnCredits'));
-        creditBtn.on('pointerdown', () => this.scene.start('Credit'));
-
-
-        // Comment jouer? button with hover effect
-        const commentBtn = this.add.image(710, 650, 'btnComment').setInteractive().setScale(1.3);
-        commentBtn.on('pointerover', () => commentBtn.setTexture('btnCommentDark'));
-        commentBtn.on('pointerout', () => commentBtn.setTexture('btnComment'));
-        commentBtn.on('pointerdown', () => this.scene.start('CommentJouer'));
-
-        // Scores
-        const ScoreBtn = this.add.image(710, 800, 'ScoreBtn').setInteractive().setScale(1.3);
-        ScoreBtn.on('pointerover', () => ScoreBtn.setTexture('ScoreBtnDark'));
-        ScoreBtn.on('pointerout', () => ScoreBtn.setTexture('ScoreBtn'));
-        ScoreBtn.on('pointerdown', () => this.scene.start('HighScoresScene'));
-        //CLICK SOUNDS
+        // Click sound for the Play button
         this.addClickSound(commencerBtn);
-        this.addClickSound(commentBtn);
-        this.addClickSound(creditBtn);
-        this.addClickSound(ScoreBtn);
-
-
-
 
         // Play background music
         if (!backgroundMusic) {
@@ -120,14 +79,30 @@ class Accueil extends Phaser.Scene {
             backgroundMusic.resume();
         }
 
+        this.cameras.main.fadeIn(1000); // 500ms fade-in effect
+        
+        // ----------------- 🎮 GAMEPAD SUPPORT -----------------
 
+    // Listen for gamepad connection
+    this.input.gamepad.once('connected', (pad) => {
+        this.pad = pad;
+    });
 
-    }
+    // Check gamepad input in update loop
+    this.input.gamepad.on('down', (pad, button) => {
+        if (button.index === 1) { // Button 1 (B on Xbox / Circle on PS)
+            console.log("✅ Gamepad button 1 pressed - Starting game!");
+            this.sound.play('clickSound'); // Play click sound
 
-    formatTime(seconds) {
-        seconds = seconds ?? 0;
-        const minutes = Math.floor(seconds / 60);
-        const remainingSeconds = Math.floor(seconds % 60);
-        return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
-    }
+        // Fade out and change scene after delay
+        this.cameras.main.fadeOut(1000);
+        this.time.delayedCall(1000, () => {
+            this.scene.start("CommentJouer");
+        });
+            
+        }
+    });
+
+   }
+
 }

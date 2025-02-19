@@ -1,6 +1,8 @@
 class Jeu extends Phaser.Scene {
   constructor() {
-    super({ key: "Jeu" });
+    super({
+      key: "Jeu"
+    });
     this.isFiring = false;
     this.playerHealth = 5;
     this.isPlayerHit = false;
@@ -10,7 +12,7 @@ class Jeu extends Phaser.Scene {
     this.isAttacking = false;
     this.isTurning = false;
     this.lastDirection = "right";
-    this.canAttack = true; // Allow attacking at the start
+    this.canAttack = true; // Allow attacking at the start  
   }
 
   preload() {
@@ -59,8 +61,10 @@ class Jeu extends Phaser.Scene {
     // Load Player Spritesheets
     this.load.spritesheet(
       "player_idle",
-      "./player_spritesheet/chevalier_repos.png",
-      { frameWidth: 120, frameHeight: 80 }
+      "./player_spritesheet/chevalier_repos.png", {
+        frameWidth: 120,
+        frameHeight: 80
+      }
     );
     this.load.spritesheet("player_run", "./player_spritesheet/_Run.png", {
       frameWidth: 120,
@@ -68,28 +72,38 @@ class Jeu extends Phaser.Scene {
     });
     this.load.spritesheet(
       "player_jump",
-      "./player_spritesheet/chevalier_saut.png",
-      { frameWidth: 120, frameHeight: 80 }
+      "./player_spritesheet/chevalier_saut.png", {
+        frameWidth: 120,
+        frameHeight: 80
+      }
     );
     this.load.spritesheet(
       "player_fall",
-      "./player_spritesheet/chevalier_tombe.png",
-      { frameWidth: 120, frameHeight: 80 }
+      "./player_spritesheet/chevalier_tombe.png", {
+        frameWidth: 120,
+        frameHeight: 80
+      }
     );
     this.load.spritesheet(
       "player_jump_fall_inbetween",
-      "./player_spritesheet/chevalier_transition_saut.png",
-      { frameWidth: 120, frameHeight: 80 }
+      "./player_spritesheet/chevalier_transition_saut.png", {
+        frameWidth: 120,
+        frameHeight: 80
+      }
     );
     this.load.spritesheet(
       "player_turnaround",
-      "./player_spritesheet/chevalier_tourne.png",
-      { frameWidth: 120, frameHeight: 80 }
+      "./player_spritesheet/chevalier_tourne.png", {
+        frameWidth: 120,
+        frameHeight: 80
+      }
     );
     this.load.spritesheet(
       "player_attack",
-      "./player_spritesheet/chevalier_attaque.png",
-      { frameWidth: 120, frameHeight: 80 }
+      "./player_spritesheet/chevalier_attaque.png", {
+        frameWidth: 120,
+        frameHeight: 80
+      }
     );
     this.load.spritesheet("player_hit", "./player_spritesheet/_Hit.png", {
       frameWidth: 120,
@@ -111,44 +125,58 @@ class Jeu extends Phaser.Scene {
     });
     this.load.spritesheet(
       "enemy_attack",
-      "./sprites/Mushroom-AttackWithStun.png",
-      { frameWidth: 80, frameHeight: 64 }
+      "./sprites/Mushroom-AttackWithStun.png", {
+        frameWidth: 80,
+        frameHeight: 64
+      }
     );
     this.load.spritesheet("enemy_death", "./sprites/Mushroom-Die.png", {
       frameWidth: 80,
       frameHeight: 64,
     });
-    
+
     // 1. Preload Slime Spritesheets
     this.load.spritesheet(
       "slime_jump_up",
-      "./sprites/Sprite Sheet - Green Jump Up.png",
-      { frameWidth: 96, frameHeight: 32 }
+      "./sprites/Sprite Sheet - Green Jump Up.png", {
+        frameWidth: 96,
+        frameHeight: 32
+      }
     );
     this.load.spritesheet(
       "slime_jump_down",
-      "./sprites/Sprite Sheet - Green Jump Down.png",
-      { frameWidth: 96, frameHeight: 32 }
+      "./sprites/Sprite Sheet - Green Jump Down.png", {
+        frameWidth: 96,
+        frameHeight: 32
+      }
     );
     this.load.spritesheet(
       "slime_jump_land",
-      "./sprites/Sprite Sheet - Green Jump Land.png",
-      { frameWidth: 96, frameHeight: 32 }
+      "./sprites/Sprite Sheet - Green Jump Land.png", {
+        frameWidth: 96,
+        frameHeight: 32
+      }
     );
     this.load.spritesheet(
       "slime_jump_start",
-      "./sprites/Sprite Sheet - Green Jump Start-up.png",
-      { frameWidth: 96, frameHeight: 32 }
+      "./sprites/Sprite Sheet - Green Jump Start-up.png", {
+        frameWidth: 96,
+        frameHeight: 32
+      }
     );
     this.load.spritesheet(
       "slime_jump_to_fall",
-      "./sprites/Sprite Sheet - Green Jump to Fall.png",
-      { frameWidth: 96, frameHeight: 32 }
+      "./sprites/Sprite Sheet - Green Jump to Fall.png", {
+        frameWidth: 96,
+        frameHeight: 32
+      }
     );
     this.load.spritesheet(
       "slime_idle",
-      "./sprites/Sprite Sheet - Green Idle.png",
-      { frameWidth: 96, frameHeight: 32 }
+      "./sprites/Sprite Sheet - Green Idle.png", {
+        frameWidth: 96,
+        frameHeight: 32
+      }
     );
 
     // Music-Sounds
@@ -162,12 +190,16 @@ class Jeu extends Phaser.Scene {
   }
 
   create() {
+
+    console.log("CREATING");
     // Debugging (Hidden by Default)
     this.debugGraphics = this.add.graphics().setVisible(true);
     this.physics.world.createDebugGraphic().setVisible(true);
 
     // Load Tilemap
-    const map = this.make.tilemap({ key: "map" });
+    const map = this.make.tilemap({
+      key: "map"
+    });
 
     // Load both tilesets
     const tileset = map.addTilesetImage("Tileset", "Tileset");
@@ -181,12 +213,20 @@ class Jeu extends Phaser.Scene {
     const platformsLayer = map.createLayer("platforms", platformTileset, 0, 0);
 
     // Enable collision on landLayer
-    landLayer.setCollisionByProperty({ collides: true });
-    platformsLayer.setCollisionByProperty({ collides: true });
+    landLayer.setCollisionByProperty({
+      collides: true
+    });
+    platformsLayer.setCollisionByProperty({
+      collides: true
+    });
 
     // Enable Collision for Platforms
-    landLayer.setCollisionByProperty({ collides: true });
-    platformsLayer.setCollisionByProperty({ collides: true });
+    landLayer.setCollisionByProperty({
+      collides: true
+    });
+    platformsLayer.setCollisionByProperty({
+      collides: true
+    });
 
     // Set World and Camera Bounds
     this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
@@ -353,7 +393,10 @@ class Jeu extends Phaser.Scene {
     // 🟢 Slime Animations
     this.anims.create({
       key: "slime_idle",
-      frames: [{ key: "slime_jump_land", frame: 0 }], // Idle frame (adjust if needed)
+      frames: [{
+        key: "slime_jump_land",
+        frame: 0
+      }], // Idle frame (adjust if needed)
       frameRate: 1,
       repeat: -1,
     });
@@ -371,7 +414,10 @@ class Jeu extends Phaser.Scene {
     // ✅ Fix for Missing Animation
     this.anims.create({
       key: "slime_jump_start",
-      frames: [{ key: "slime_jump_start", frame: 0 }], // Single-frame "jump start"
+      frames: [{
+        key: "slime_jump_start",
+        frame: 0
+      }], // Single-frame "jump start"
       frameRate: 1,
       repeat: -1,
     });
@@ -526,8 +572,7 @@ class Jeu extends Phaser.Scene {
     this.rubisText = this.add.text(
       this.player.x,
       this.player.y - 30,
-      "Un Rubis Ancien...",
-      {
+      "Un Rubis Ancien...", {
         fontFamily: "Arial",
         fontSize: "16px",
         color: "#ffffff",
@@ -537,31 +582,35 @@ class Jeu extends Phaser.Scene {
     );
     this.rubisText.setOrigin(0.5, 1);
     this.rubisText.setVisible(false); // Hide initially
-    
-// ---------------- ENDING ----------------
-this.physics.add.overlap(this.player, this.rubisGroup, (player, rubis) => {
-  if (this.collectedQuestItems >= 3) {
-      this.triggerEnding();
-  }
-  
 
+    // ---------------- ENDING ----------------
 
-      
+    // ---------------- OLD ENDING ----------------
+    //this.physics.add.overlap(this.player, this.rubisGroup, (player, rubis) => {
+    //if (this.collectedQuestItems >= 3) {
+    //this.triggerEnding();
+    //}
 
-    // Show a message based on how many quest items have been collected
-    let message = "Un Rubis Ancien...";
-    if (this.collectedQuestItems > 0) {
+    this.physics.add.overlap(this.player, this.rubisGroup, (player, rubis) => {
+      if (this.collectedQuestItems >= 3 && this.attack ) {
+        console.log("✅ Ending triggered by gamepad!");
+        this.triggerEnding();
+      }
+
+      // Show a message based on how many quest items have been collected
+      let message = "Un Rubis Ancien...";
+      if (this.collectedQuestItems > 0) {
         message = `Vous avez trouvé ${this.collectedQuestItems} pièce(s) du Rubis !`;
-    }
+      }
       this.rubisText.setText(message);
       this.rubisText.setPosition(this.player.x, this.player.y - 30);
       this.rubisText.setVisible(true);
-  
+
       // Hide text after 2 seconds
       this.time.delayedCall(2000, () => {
-          this.rubisText.setVisible(false);
+        this.rubisText.setVisible(false);
       });
-  });
+    });
 
     // Create background layers with lower depth (behind everything)
     this.bg1 = this.add.image(0, 0, "bg1").setOrigin(0, 0).setDepth(-10);
@@ -637,7 +686,7 @@ this.physics.add.overlap(this.player, this.rubisGroup, (player, rubis) => {
     this.hpBar = this.add
       .image(20, 20, "hp_5") // Start with full HP
       .setOrigin(0, 0) // Align to the top-left
-      .setScale(0.5) // Adjust size
+      .setScale(0.3) // Adjust size
       .setScrollFactor(0) // Keep it static
       .setDepth(1000); // Ensure it's above everything
 
@@ -678,8 +727,14 @@ this.physics.add.overlap(this.player, this.rubisGroup, (player, rubis) => {
       console.log("🎮 Gamepad Connected:", pad.id);
     });
 
+    this.cameras.main.fadeIn(1000); // 500ms fade-in effect
+
+    this.gamepadbutton1 = false;
+    this.gamepadbutton0 = false;
 
     this.endingTriggered = false;
+
+
   }
 
   updateHealthBar() {
@@ -716,14 +771,18 @@ this.physics.add.overlap(this.player, this.rubisGroup, (player, rubis) => {
       if (player.hp < 5) {
         player.hp++;
         this.updateHealthBar();
-        this.sound.play("potionSound", { volume: 1.2 }); // Play potion pickup sound
+        this.sound.play("potionSound", {
+          volume: 1.2
+        }); // Play potion pickup sound
       }
     }
   }
 
   collectQuestItem(player, item) {
     // ✅ Play quest pickup sound effect
-    this.sound.play("questSound", { volume: 1.5 });
+    this.sound.play("questSound", {
+      volume: 1.5
+    });
 
     item.destroy(); // Remove the item
     this.collectedQuestItems++; // Increment collected count
@@ -775,7 +834,9 @@ this.physics.add.overlap(this.player, this.rubisGroup, (player, rubis) => {
       console.log(`Player HP: ${player.hp}`);
 
       // ✅ Play damage sound effect
-      this.sound.play("damageSound", { volume: 1.5 });
+      this.sound.play("damageSound", {
+        volume: 1.5
+      });
 
       // ✅ Stop all animations and enforce the hit sprite
       player.play("player_hit", true);
@@ -877,11 +938,18 @@ this.physics.add.overlap(this.player, this.rubisGroup, (player, rubis) => {
     // INPUTS
     // ------------------------------------------------------
 
-    // Read existing movement inputs
-    let jump = false;
-    let attack = false;
 
-    const { cursors, keys, gamepad } = this.inputHandler;
+
+    // Read existing movement inputs
+    this.jump = false;
+    this.attack = false;
+
+
+    const {
+      cursors,
+      keys,
+      gamepad
+    } = this.inputHandler;
 
     // Movement: Left / Right (Keyboard or Gamepad)
     let moveLeft =
@@ -890,20 +958,42 @@ this.physics.add.overlap(this.player, this.rubisGroup, (player, rubis) => {
       cursors.right.isDown || (gamepad && gamepad.axes[0].getValue() > 0.5);
 
     // Jump: Use JustDown() for keyboard and check gamepad button (Button A = index 0)
-    if (
-      Phaser.Input.Keyboard.JustDown(keys.jump) ||
-      (gamepad && gamepad.buttons[0].pressed)
-    ) {
+
+
+    // MANAGE GAMEPAD BUTTON 0 JUST DOWN
+    let gemePadButton0JustPressed = false;
+    if (gamepad) {
+      let buttonPressed = gamepad.buttons[0].pressed;
+      if (buttonPressed && this.gamepadbutton0 == false) {
+        gemePadButton0JustPressed = true;
+
+      }
+      this.gamepadbutton0  = buttonPressed;
+    }
+   
+
+    // JUMP INPUT
+    if (Phaser.Input.Keyboard.JustDown(keys.jump) || gemePadButton0JustPressed) {
       console.log("Jump input");
-      jump = true;
+      this.jump = true;
+
+    }
+
+    // MANAGE GAMEPAD BUTTON 1 JUST DOWN
+    let gemePadButton1JustPressed = false;
+    if (gamepad) {
+      let buttonPressed = gamepad.buttons[1].pressed;
+      if (buttonPressed && this.gamepadbutton1 == false) {
+        console.log("just");
+        gemePadButton1JustPressed = true;
+
+      }
+      this.gamepadbutton1  = buttonPressed;
     }
 
     // Attack: Use JustDown() for better control (Button B = index 1)
-    if (
-      Phaser.Input.Keyboard.JustDown(keys.attack) ||
-      (gamepad && gamepad.buttons[1].pressed)
-    ) {
-      attack = true;
+    if ( Phaser.Input.Keyboard.JustDown(keys.attack) || gemePadButton1JustPressed ) {
+      this.attack = true;
       console.log("Attack input");
     }
 
@@ -969,12 +1059,14 @@ this.physics.add.overlap(this.player, this.rubisGroup, (player, rubis) => {
       }
 
       // Jumping logic
-      if (jump && this.player.body.blocked.down) {
+      if (this.jump && this.player.body.blocked.down) {
         this.player.setVelocityY(-340);
         this.player.play("jump", true);
         console.log("Start jump animation");
         // Play jump sound effect
-        this.sound.play("jumpSound", { volume: 1.5 }); // Adjust volume if needed
+        this.sound.play("jumpSound", {
+          volume: 1.5
+        }); // Adjust volume if needed
       }
 
       // LAND
@@ -989,7 +1081,9 @@ this.physics.add.overlap(this.player, this.rubisGroup, (player, rubis) => {
       if (this.wasInAir && this.player.body.blocked.down) {
         if (!this.landedRecently) {
           // Prevent multiple triggers
-          this.sound.play("landingSound", { volume: 1.5 });
+          this.sound.play("landingSound", {
+            volume: 1.5
+          });
           this.landedRecently = true;
 
           // Reset the flag after a short delay
@@ -1015,25 +1109,27 @@ this.physics.add.overlap(this.player, this.rubisGroup, (player, rubis) => {
     //
 
     // Trigger Attack
-    if (attack && this.canAttack) {
+    if (this.attack && this.canAttack) {
       console.log("Attack triggered");
       this.canAttack = false; // Prevent attacking again immediately
       this.isAttacking = true; // Set attack flag
 
-      this.sound.play("attackSound", { volume: 1.5 }); // Adjust volume if needed
+      this.sound.play("attackSound", {
+        volume: 1.5
+      }); // Adjust volume if needed
       this.player.setVelocityX(0); // Stop movement during attack
 
       // Reset attack ability after cooldown
-      
-            this.time.delayedCall(600, () => { // Adjust the delay as needed
-                this.canAttack = true;
-            });
+
+      this.time.delayedCall(600, () => { // Adjust the delay as needed
+        this.canAttack = true;
+      });
 
       this.player.play("attack", true);
       // Wait until the attack animation completes before resetting attack flag
       this.player.once("animationcomplete", () => {
         this.isAttacking = false; // Reset attack flag
-        
+
         this.player.play("idle", true); // Go back to idle
         console.log("Attack animation complete");
       });
@@ -1169,6 +1265,7 @@ this.physics.add.overlap(this.player, this.rubisGroup, (player, rubis) => {
   }
 
   update() {
+
     this.updatePlayer();
 
 
@@ -1178,7 +1275,7 @@ this.physics.add.overlap(this.player, this.rubisGroup, (player, rubis) => {
     this.updateUI();
 
     this.updateCamera();
-    
+
 
     if (this.inputHandler.gamepad == null) {
       if (this.input.gamepad.gamepads.length > 0) {
