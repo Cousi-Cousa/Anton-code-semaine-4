@@ -5,7 +5,7 @@ class Accueil extends Phaser.Scene {
 
     preload() {
         this.load.image('background', './images/Background.png');
-        this.load.image('logo', './images/logo.png');
+        this.load.image('logo', './images/logo2.png');
         this.load.image('btnCommencer', './images/Start.png');
         this.load.image('btnCommencerDark', './images/Start_Dark.png');
 
@@ -31,7 +31,7 @@ class Accueil extends Phaser.Scene {
         this.registry.set('menuMusic', this.menuMusic);
 
         // Create the logo
-        const logo = this.add.image(955, 300, 'logo').setScale(2);
+        const logo = this.add.image(955, 300, 'logo').setScale(0.1);
 
         // Shine effect on the logo
         const shineEffect = logo.postFX.addShine(1, 0.2, 5);
