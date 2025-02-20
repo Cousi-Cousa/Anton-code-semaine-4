@@ -173,7 +173,7 @@ class Jeu extends Phaser.Scene {
     );
     this.load.spritesheet(
       "slime_idle",
-      "./sprites/Sprite Sheet - Green Idle.png", {
+      "./sprites/Slime_idle.png", {
         frameWidth: 96,
         frameHeight: 32
       }
@@ -405,7 +405,7 @@ class Jeu extends Phaser.Scene {
       key: "slime_move",
       frames: this.anims.generateFrameNumbers("slime_idle", {
         start: 0,
-        end: 5,
+        end: 6,
       }),
       frameRate: 6, // Adjust speed if needed
       repeat: -1, // Loop the animation continuously
@@ -428,14 +428,29 @@ class Jeu extends Phaser.Scene {
       let slime = this.slimes.create(obj.x, obj.y, "slime_jump_start");
       slime.setCollideWorldBounds(true);
       slime.setBounce(1);
-      slime.setVelocityX(5); // Slime moves left/right
+      slime.setVelocityX(50); // Slime moves left/right
       slime.setScale(0.5); // Resize slime to make it smaller
 
+      // Reverse direction every 2 seconds
+   this.time.addEvent({
+     delay: 3000, // Time in milliseconds (2s)
+     loop: true,
+     callback: () => {
+         slime.setVelocityX(slime.body.velocity.x * -1); // Reverse direction
+     }
+ });
+ 
+ this.slimes.getChildren().forEach((slime) => {
+  slime.setSize(35, 20); // Adjust width and height of the hitbox
+  slime.setOffset(30, 10); // Move hitbox inside the sprite (if needed)
+});
+ 
+      
       slime.homeX = obj.x; // Store initial position
       slime.patrolRange = 80; // Slime will move 100 pixels left & right from home
       slime.speed = 50; // Adjust speed
       slime.direction = 1; // 1 for right, -1 for left
-
+ 
       slime.play("slime_move", true);
     });
     this.physics.add.collider(this.slimes, platformsLayer);
@@ -507,9 +522,11 @@ class Jeu extends Phaser.Scene {
       questLayer.objects.forEach((obj) => {
         const questItem = this.questItems.create(
           obj.x,
-          obj.y - 16,
+          obj.y -16,
           "questItemSheet"
         );
+
+        
         questItem.setOrigin(0, 0).setScale(1);
         questItem.body.setAllowGravity(false);
         questItem.setData("collected", false); // Mark it as not yet collected
@@ -686,7 +703,7 @@ class Jeu extends Phaser.Scene {
     this.hpBar = this.add
       .image(20, 20, "hp_5") // Start with full HP
       .setOrigin(0, 0) // Align to the top-left
-      .setScale(0.3) // Adjust size
+      .setScale(0.2) // Adjust size
       .setScrollFactor(0) // Keep it static
       .setDepth(1000); // Ensure it's above everything
 
@@ -727,7 +744,7 @@ class Jeu extends Phaser.Scene {
       console.log("🎮 Gamepad Connected:", pad.id);
     });
 
-    this.cameras.main.fadeIn(1000); // 500ms fade-in effect
+    this.cameras.main.fadeIn(2000); // 500ms fade-in effect
 
     this.gamepadbutton1 = false;
     this.gamepadbutton0 = false;
@@ -884,6 +901,7 @@ class Jeu extends Phaser.Scene {
         player.isDead = true;
         player.setVelocity(0);
         player.setTint(0x000000);
+        player.anims.play("player_death", true); // Play death animation
 
         // ⏳ Delay before restarting the scene
         this.time.delayedCall(100, () => {
@@ -1159,7 +1177,7 @@ class Jeu extends Phaser.Scene {
 
   updateUI() {
     // Update UI
-    this.hpBar.setPosition(762, 544);
+    this.hpBar.setPosition(860, 380);
     //console.log(this.player.x, this.player.y - 40);
 
     if (this.questTextFollow) {

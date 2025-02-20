@@ -52,7 +52,8 @@ this.load.audio('clickSound', './Sounds/retro-click-236673.mp3');
         this.input.gamepad.once('connected', (pad) => {
             this.pad = pad;
         });
-    
+
+
         this.input.gamepad.on('down', (pad, button) => {
             if (button.index === 1) { // Button 1 (B on Xbox / Circle on PS)
                 console.log("✅ Gamepad button 1 pressed - Starting game!");

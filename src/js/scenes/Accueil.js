@@ -88,6 +88,8 @@ class Accueil extends Phaser.Scene {
         this.pad = pad;
     });
 
+
+
     // Check gamepad input in update loop
     this.input.gamepad.on('down', (pad, button) => {
         if (button.index === 1) { // Button 1 (B on Xbox / Circle on PS)
