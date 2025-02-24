@@ -238,7 +238,7 @@ class Jeu extends Phaser.Scene {
       .setBounce(0.1)
       .setCollideWorldBounds(true)
       .setGravityY(800)
-      .setSize(30, 40)
+      .setSize(20, 40)
       .setOffset(40, 40);
     this.physics.add.collider(this.player, platformsLayer);
     this.physics.add.collider(this.player, landLayer);
@@ -666,15 +666,14 @@ class Jeu extends Phaser.Scene {
     );
 
     // Attach backgrounds to camera movement
-    this.cameras.main.startFollow(this.player, true, 0.05, 0.05);
+    this.cameras.main.startFollow(this.player, true);
 
     // Set Debug Graphics Depth
     this.debugGraphics.setDepth(15);
 
     // -------------------- 🎥 Camera Setup --------------------
-    this.cameras.main
-      .setZoom(3)
-      .startFollow(this.player, true, 0.05, 0.05, 0, 75);
+    this.cameras.main.setZoom(3);
+    this.cameras.main.startFollow(this.player, true, 0.05, 0.02);
 
     // -------------------- ❤️ Player Setup --------------------
     this.player.hp = 5;
@@ -780,10 +779,24 @@ class Jeu extends Phaser.Scene {
   }
 
   collectPotion(player, potion) {
+    if (!potion.getData("collected") && player.hp < 5) {
+        potion.setData("collected", true);
+        potion.destroy(); // Remove from scene
+
+        // Restore HP one by one, but not beyond max HP (5)
+        player.hp++;
+        this.updateHealthBar();
+        this.sound.play("potionSound", { volume: 1.2 }); // Play potion pickup sound
+    }
+}
+
+  /*
+  collectPotion(player, potion) {
     if (!potion.getData("collected")) {
       potion.setData("collected", true);
       potion.destroy(); // Remove from scene
 
+      
       // Restore HP one by one, but not beyond max HP (5)
       if (player.hp < 5) {
         player.hp++;
@@ -794,6 +807,7 @@ class Jeu extends Phaser.Scene {
       }
     }
   }
+  */
 
   collectQuestItem(player, item) {
     // ✅ Play quest pickup sound effect
@@ -867,7 +881,7 @@ class Jeu extends Phaser.Scene {
       this.updateHealthBar();
 
       // ✅ Reset hitbox immediately upon hit
-      player.body.setSize(30, 40);
+      player.body.setSize(40, 40);
       player.body.setOffset(40, 40);
 
       // ✅ Apply Knockback
@@ -1066,7 +1080,7 @@ class Jeu extends Phaser.Scene {
       }
 
       // Keep hitbox aligned when idle
-      this.player.body.setOffset(this.lastDirection === "left" ? 50 : 40, 40);
+      this.player.body.setOffset(this.lastDirection === "left" ? 54 : 44, 40);
 
       // JUMP
       // ------------------------------------------------------
