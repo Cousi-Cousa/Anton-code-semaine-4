@@ -22,6 +22,9 @@ class Jeu extends Phaser.Scene {
     }
 
     // Load Heart images
+    this.load.image("texte_debut", "./images/texte_debut 2.png");
+    
+    // Load Heart images
     this.load.image("hp_5", "./images/coeur_5.png");
     this.load.image("hp_4", "./images/coeur_4.png");
     this.load.image("hp_3", "./images/coeur_3.png");
@@ -187,6 +190,8 @@ class Jeu extends Phaser.Scene {
     this.load.audio("damageSound", "sounds/Damage.wav");
     this.load.audio("questSound", "sounds/QuestPickUp.wav");
     this.load.audio("walkSound", "sounds/Walk.wav");
+    this.load.audio("mushroomAttack", "sounds/attaque_champignon_test 2.wav");
+    
   }
 
   create() {
@@ -742,15 +747,79 @@ class Jeu extends Phaser.Scene {
       this.inputHandler.gamepad = pad;
       console.log("🎮 Gamepad Connected:", pad.id);
     });
+    
+    
+  // -------------------- KING MESSAGE --------------------
+  // Add the starting image
+  this.startScreen = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, 'texte_debut')
+    .setOrigin(2.3, 0)
+    .setScale(0.35)
+    .setDepth(100) // Ensures it appears on top of everything
+    .setAlpha(0); // Start invisible
 
+// Fade-in effect + move up slightly
+this.tweens.add({
+  targets: this.startScreen,
+  alpha: 1, // Fully visible
+  y: this.cameras.main.centerY - 50, // Move up
+  duration: 1000, // Fade-in & move-up duration (1 sec)
+  ease: 'Linear'
+});
+// Prevent interaction before the cooldown is over
+this.canDismissImage = false;
+
+// Start a 3-second cooldown before the player can remove the image
+this.time.delayedCall(3000, () => {
+  this.canDismissImage = true; // After 3 sec, allow image removal
+}, [], this);
+
+// Function to fade out + move down when attack is used
+const removeStartScreen = () => {
+  if (this.canDismissImage) {
+      this.tweens.add({
+          targets: this.startScreen,
+          alpha: 0, // Fade out smoothly
+          y: this.cameras.main.centerY + 50, // Move down
+          duration: 1000, // Fade-out & move-down duration (1 sec)
+          ease: 'Linear',
+          onComplete: () => {
+              this.startScreen.destroy(); // Remove image after fade-out
+          }
+      });
+  }
+};
+
+// Check attack input in the update loop
+this.input.keyboard.on('keydown-Z', removeStartScreen); // Z key (attack)
+this.events.on('update', () => {
+    if (this.attack) { // If attack is triggered in your existing system
+        removeStartScreen();
+    }
+});
+
+// Keep gamepad support (even if it’s not working yet)
+this.input.gamepad?.on('down', (pad, button) => {
+    if (button.index === 1) { // Button 1 (attack)
+        removeStartScreen();
+    }
+});
+    
+    
     this.cameras.main.fadeIn(2000); // 500ms fade-in effect
-
+    
     this.gamepadbutton1 = false;
     this.gamepadbutton0 = false;
 
     this.endingTriggered = false;
 
 
+  }
+  
+  removeStartScreen() {
+    if (this.startScreen) {
+      this.startScreen.destroy();
+      this.startScreen = null;
+    }
   }
 
   updateHealthBar() {
@@ -881,7 +950,7 @@ class Jeu extends Phaser.Scene {
       this.updateHealthBar();
 
       // ✅ Reset hitbox immediately upon hit
-      player.body.setSize(40, 40);
+      player.body.setSize(20, 40);
       player.body.setOffset(40, 40);
 
       // ✅ Apply Knockback
@@ -1249,6 +1318,7 @@ class Jeu extends Phaser.Scene {
           enemy.setVelocityX(0);
           enemy.isAttacking = true;
           enemy.play("enemy_attack", true);
+          this.sound.play("mushroomAttack", { volume: 3 }); // Play potion pickup sound
           enemy.flipX = this.player.x > enemy.x;
 
           enemy.on("animationupdate", (anim, frame) => {
