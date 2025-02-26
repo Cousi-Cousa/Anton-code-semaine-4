@@ -190,7 +190,7 @@ class Jeu extends Phaser.Scene {
     this.load.audio("damageSound", "sounds/Damage.wav");
     this.load.audio("questSound", "sounds/QuestPickUp.wav");
     this.load.audio("walkSound", "sounds/Walk.wav");
-    this.load.audio("mushroomAttack", "sounds/attaque_champignon_test 2.wav");
+    this.load.audio("mushroomAttack", "sounds/attaque_champignon_test 4.wav");
     
   }
 
