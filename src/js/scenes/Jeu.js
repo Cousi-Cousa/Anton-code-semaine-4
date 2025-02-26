@@ -191,6 +191,9 @@ class Jeu extends Phaser.Scene {
     this.load.audio("questSound", "sounds/QuestPickUp.wav");
     this.load.audio("walkSound", "sounds/Walk.wav");
     this.load.audio("mushroomAttack", "sounds/attaque_champignon_test 5.wav");
+    this.load.audio("rubisSound", "sounds/ambiance_artefact_reaper 1.wav");
+
+    
     
   }
 
@@ -390,6 +393,19 @@ class Jeu extends Phaser.Scene {
     // Enable collision with platforms
     this.physics.add.collider(this.enemies, landLayer);
     this.physics.add.collider(this.enemies, platformsLayer);
+
+    // Load the enemy sound in the create function
+this.enemy1Sound = this.sound.add("rubisSound", {
+  loop: true // Ensures the sound loops
+});
+
+
+// Start the sound **only when the player is close enough**
+this.soundPlaying = false; // Track if sound is playing
+
+// Play the sound at 100% volume initially (optional)
+this.enemy1Sound.play();
+this.enemy1Sound.setVolume(0); // Start at 0 volume to avoid abrupt noise
 
     // this.enemy.play("enemy_idle");
 
@@ -604,6 +620,10 @@ class Jeu extends Phaser.Scene {
     );
     this.rubisText.setOrigin(0.5, 1);
     this.rubisText.setVisible(false); // Hide initially
+    
+    this.rubisSound = this.sound.add("rubisSound", { loop: true, volume: 0 });
+    this.rubisSoundPlaying = false; // Ensure it's not playing by default
+   
 
     // ---------------- ENDING ----------------
 
@@ -1367,10 +1387,7 @@ this.input.gamepad?.on('down', (pad, button) => {
   }
 
   update() {
-
     this.updatePlayer();
-
-
 
     this.updateEnnemies();
 
@@ -1385,5 +1402,66 @@ this.input.gamepad?.on('down', (pad, button) => {
         console.log("Added gamepad");
       }
     }
-  }
+    
+    // === 🎵 RUBIS SOUND LOGIC (FADE IN/OUT BASED ON DISTANCE) ===
+    if (this.rubisGroup.getChildren().length > 0) {
+      let rubis = this.rubisGroup.getChildren()[0]; // Get the first Rubis object
+      let distance = Phaser.Math.Distance.Between(
+        this.player.x, this.player.y,
+        rubis.x, rubis.y
+      );
+
+      let maxDistance = 600; // Maximum hearing range
+      let minDistance = 50; // Closest distance for full volume
+
+      // Calculate volume based on distance
+      let volume = Phaser.Math.Clamp(1 - (distance - minDistance) / (maxDistance - minDistance), 0, 1);
+
+      if (volume > 0) {
+        if (!this.rubisSoundPlaying) {
+          this.rubisSound.play(); // Start sound
+          this.rubisSoundPlaying = true;
+        }
+        this.rubisSound.setVolume(volume);
+      } else {
+        if (this.rubisSoundPlaying) {
+          this.rubisSound.stop(); // Stop sound when too far
+          this.rubisSoundPlaying = false;
+        }
+      }
+    }
+
+    // === 🎵 SLIME SOUND LOGIC (FADE IN/OUT BASED ON DISTANCE) ===
+    this.slimes.children.iterate((slime) => {
+      if (!slime) return;
+
+      let distance = Phaser.Math.Distance.Between(
+        this.player.x, this.player.y,
+        slime.x, slime.y
+      );
+
+      let maxDistance = 300; // Max hearing range
+      let minDistance = 50; // Full volume range
+
+      // Calculate volume based on distance
+      let volume = Phaser.Math.Clamp(1 - (distance - minDistance) / (maxDistance - minDistance), 0, 1);
+
+      // Initialize sound instance per slime
+      if (!slime.soundInstance) {
+        slime.soundInstance = this.sound.add("jumpSound", {
+          loop: true
+        });
+        slime.soundInstance.play();
+        slime.soundInstance.setVolume(0); // Start at 0 volume
+      }
+
+      if (volume > 0) {
+        slime.soundInstance.setVolume(volume);
+      } else {
+        slime.soundInstance.setVolume(0);
+      }
+    });
+  
+
+}
 }
