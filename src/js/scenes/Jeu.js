@@ -115,11 +115,11 @@ class Jeu extends Phaser.Scene {
       frameWidth: 120,
       frameHeight: 80,
     });
-    this.load.spritesheet("player_death", "./player_spritesheet/_Death.png", {
-      frameWidth: 120,
-      frameHeight: 80,
-    });
-
+    this.load.spritesheet("player_death", "./player_spritesheet/Death.png", {
+      frameWidth: 120, 
+      frameHeight: 80
+  });
+  
     // Load Enemy Spritesheets
     this.load.spritesheet("enemy_idle", "./sprites/Mushroom-Idle.png", {
       frameWidth: 80,
@@ -336,12 +336,14 @@ class Jeu extends Phaser.Scene {
     this.anims.create({
       key: "player_death",
       frames: this.anims.generateFrameNumbers("player_death", {
-        start: 0,
-        end: 3,
+          start: 0,
+          end: 19 
       }),
-      frameRate: 10,
+      frameRate: 3,
       repeat: 0,
-    });
+
+  });
+  
     this.anims.create({
       key: "player_hit",
       frames: this.anims.generateFrameNumbers("player_hit", {
@@ -719,7 +721,7 @@ this.enemy1Sound.setVolume(0); // Start at 0 volume to avoid abrupt noise
     this.cameras.main.startFollow(this.player, true, 0.05, 0.02);
 
     // -------------------- ❤️ Player Setup --------------------
-    this.player.hp = 5;
+    this.player.hp = 2;
     this.player.isInvulnerable = false;
     this.player.play("idle");
 
@@ -1023,12 +1025,14 @@ this.hasDoubleJumped = false; // Tracks if the double jump has been used
       // ✅ Check for player death
       if (player.hp <= 0 && !player.isDead) {
         player.isDead = true;
-        player.setVelocity(0);
-        player.setTint(0x000000);
+        player.setVelocity(0, 0);
+        
+ 
         player.anims.play("player_death", true); // Play death animation
+        console.log ("player_death");
 
         // ⏳ Delay before restarting the scene
-        this.time.delayedCall(100, () => {
+        this.time.delayedCall(3000, () => {
           this.scene.start("Accueil");
         });
       }
@@ -1407,12 +1411,19 @@ this.hasDoubleJumped = false; // Tracks if the double jump has been used
                 this.dealDamage(this.player);
 
                 // Apply faster knockback to player
-                const knockback = 50; // Increased knockback speed
-                const direction = this.player.x < enemy.x ? -1 : 1;
-                this.player.setVelocityX(knockback * direction);
-              }
-            }
-          });
+                if (!this.player.isDead) {
+                  const knockback = 50; // Increased knockback speed
+                  const direction = this.player.x < enemy.x ? -1 : 1;
+                  this.player.setVelocityX(knockback * direction);
+                } else {
+                  // Stop the player's movement shortly after being knocked back
+                  this.time.delayedCall(300, () => {
+                    this.player.setVelocity(0, 0);
+                  });
+                }
+                }
+                }
+                });
 
           enemy.once("animationcomplete", () => {
             enemy.isAttacking = false;
@@ -1436,7 +1447,8 @@ this.hasDoubleJumped = false; // Tracks if the double jump has been used
   }
 
   update() {
-    this.updatePlayer();
+    if(!this.player.isDead )this.updatePlayer();
+
 
     this.updateEnnemies();
 
