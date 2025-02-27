@@ -37,6 +37,9 @@ class Jeu extends Phaser.Scene {
     this.load.image("Tileset", "./sprites/Tileset.png");
     this.load.image("platforms", "./sprites/platforms.png");
     this.load.image("tileset_1", "./sprites/tileset_1.png");
+    this.load.image("platform", "./sprites/platform.png");
+    this.load.image("land", "./sprites/land.png");
+    this.load.image("decoration", "./sprites/decoration.png");
 
     // Load Fruit Spritesheet
     this.load.spritesheet("fruitSheet", "./sprites/fruit.png", {
@@ -212,13 +215,23 @@ class Jeu extends Phaser.Scene {
     // Load both tilesets
     const tileset = map.addTilesetImage("Tileset", "Tileset");
     const tileset1 = map.addTilesetImage("tileset_1", "tileset_1"); // New tileset
-    const platformTileset = map.addTilesetImage("platforms", "platforms");
+    
+    
+    const platformTiles = map.addTilesetImage("platform", "platform");
+    const landTiles = map.addTilesetImage("land", "land");
+    const decorationTiles = map.addTilesetImage("decoration", "decoration");
 
     // Apply tilesets to layers
     map.createLayer("sky", tileset, 0, 0);
-    const landLayer = map.createLayer("land", [tileset, tileset1], 0, 0); // ✅ Uses both tilesets
+    const landLayer = map.createLayer("land", [tileset, landTiles, tileset1], 0, 0); // ✅ Uses both tilesets
+    const platformsLayer = map.createLayer("platforms", platformTiles, 0, 0);
+    const decorationLayer = map.createLayer("structure", decorationTiles, 0, 0);
+    if (!decorationLayer) {
+        console.error("❌ Decoration layer failed to load.");
+    }
 
-    const platformsLayer = map.createLayer("platforms", platformTileset, 0, 0);
+    
+    
 
     // Enable collision on landLayer
     landLayer.setCollisionByProperty({
@@ -228,6 +241,8 @@ class Jeu extends Phaser.Scene {
       collides: true
     });
 
+    
+
     // Enable Collision for Platforms
     landLayer.setCollisionByProperty({
       collides: true
@@ -235,6 +250,9 @@ class Jeu extends Phaser.Scene {
     platformsLayer.setCollisionByProperty({
       collides: true
     });
+
+
+    
 
     // Set World and Camera Bounds
     this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
@@ -824,6 +842,9 @@ this.input.gamepad?.on('down', (pad, button) => {
     }
 });
     
+this.canDoubleJump = false; // Tracks if the player can double jump
+this.hasDoubleJumped = false; // Tracks if the double jump has been used
+
     
     this.cameras.main.fadeIn(2000); // 500ms fade-in effect
     
@@ -1179,16 +1200,44 @@ this.input.gamepad?.on('down', (pad, button) => {
         this.walkSound.stop();
       }
 
-      // Jumping logic
-      if (this.jump && this.player.body.blocked.down) {
-        this.player.setVelocityY(-340);
-        this.player.play("jump", true);
-        console.log("Start jump animation");
-        // Play jump sound effect
-        this.sound.play("jumpSound", {
-          volume: 1.5
-        }); // Adjust volume if needed
-      }
+      // OLD Jumping logic
+      /*
+            // Jumping logic
+            if (this.jump && this.player.body.blocked.down) {
+              this.player.setVelocityY(-340);
+              this.player.play("jump", true);
+              console.log("Start jump animation");
+              // Play jump sound effect
+              this.sound.play("jumpSound", {
+                volume: 1.5
+              }); // Adjust volume if needed
+            }
+      */
+
+            // JUMP LOGIC (SINGLE & DOUBLE JUMP)
+            if (this.jump) {
+              if (this.player.body.blocked.down) {
+                // ✅ Normal Jump from Ground
+                this.player.setVelocityY(-340);
+                this.player.play("jump", true);
+                this.sound.play("jumpSound", {
+                  volume: 1.5
+                });
+
+                this.canDoubleJump = true; // Allow double jump
+                this.hasDoubleJumped = false; // Reset double jump flag
+              } else if (this.canDoubleJump && !this.hasDoubleJumped) {
+                // ✅ Double Jump in the Air
+                this.player.setVelocityY(-300); // Slightly less force than first jump
+                this.player.play("jump", true);
+                this.sound.play("jumpSound", {
+                  volume: 1.2
+                }); // Lower volume for second jump
+
+                this.hasDoubleJumped = true; // Mark that double jump was used
+              }
+            }
+
 
       // LAND
       // ------------------------------------------------------
@@ -1402,7 +1451,7 @@ this.input.gamepad?.on('down', (pad, button) => {
         console.log("Added gamepad");
       }
     }
-    
+
     // === 🎵 RUBIS SOUND LOGIC (FADE IN/OUT BASED ON DISTANCE) ===
     if (this.rubisGroup.getChildren().length > 0) {
       let rubis = this.rubisGroup.getChildren()[0]; // Get the first Rubis object
@@ -1461,6 +1510,8 @@ this.input.gamepad?.on('down', (pad, button) => {
         slime.soundInstance.setVolume(0);
       }
     });
+
+    
   
 
 }
