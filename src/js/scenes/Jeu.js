@@ -339,7 +339,7 @@ class Jeu extends Phaser.Scene {
           start: 0,
           end: 19 
       }),
-      frameRate: 3,
+      frameRate: 10,
       repeat: 0,
 
   });
@@ -1007,7 +1007,7 @@ this.hasDoubleJumped = false; // Tracks if the double jump has been used
       });
 
       // ⏳ **Control movement lock and animation recovery**
-      this.time.delayedCall(1000, () => {
+      this.time.delayedCall(2500, () => {
         player.isInvulnerable = false;
 
         // ✅ Ensure the player transitions to the correct animation state
@@ -1032,7 +1032,7 @@ this.hasDoubleJumped = false; // Tracks if the double jump has been used
         console.log ("player_death");
 
         // ⏳ Delay before restarting the scene
-        this.time.delayedCall(3000, () => {
+        this.time.delayedCall(2500, () => {
           this.scene.start("Accueil");
         });
       }
