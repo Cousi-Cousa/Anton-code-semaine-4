@@ -17,7 +17,7 @@ class Jeu extends Phaser.Scene {
 
   preload() {
     // Load Background Layers
-    for (let i = 1; i <= 12; i++) {
+    for (let i = 1; i <= 10; i++) {
       this.load.image(`bg${i}`, `./sprites/background/${i}.png`);
     }
 
@@ -215,17 +215,19 @@ class Jeu extends Phaser.Scene {
     // Load both tilesets
     const tileset = map.addTilesetImage("Tileset", "Tileset");
     const tileset1 = map.addTilesetImage("tileset_1", "tileset_1"); // New tileset
-    
-    
     const platformTiles = map.addTilesetImage("platform", "platform");
     const landTiles = map.addTilesetImage("land", "land");
-    const decorationTiles = map.addTilesetImage("decoration", "decoration");
+    const decorationTiles = map.addTilesetImage("decoration", "decoration"); // ✅ Ajout du tileset de décoration
+
+    
 
     // Apply tilesets to layers
-    map.createLayer("sky", tileset, 0, 0);
-    const landLayer = map.createLayer("land", [tileset, landTiles, tileset1], 0, 0); // ✅ Uses both tilesets
+    
+    const skyLayer = map.createLayer("sky", decorationTiles, 0, 0); // Sky should be created FIRST
+    const landLayer = map.createLayer("land", [tileset, tileset1, landTiles, decorationTiles], 0, 0); // ✅ Ajout du décor dans le sol
     const platformsLayer = map.createLayer("platforms", platformTiles, 0, 0);
     const decorationLayer = map.createLayer("structure", decorationTiles, 0, 0);
+    
     if (!decorationLayer) {
         console.error("❌ Decoration layer failed to load.");
     }
@@ -233,13 +235,14 @@ class Jeu extends Phaser.Scene {
     
     
 
-    // Enable collision on landLayer
-    landLayer.setCollisionByProperty({
-      collides: true
-    });
-    platformsLayer.setCollisionByProperty({
-      collides: true
-    });
+// ✅ Désactiver la collision pour la décoration
+decorationLayer.setDepth(-1); // Mettre en arrière-plan
+decorationLayer.setCollisionByProperty({ collides: false });
+
+// ✅ Activer la collision uniquement pour le sol et les plateformes
+landLayer.setCollisionByProperty({ collides: true });
+platformsLayer.setCollisionByProperty({ collides: true });
+skyLayer.setCollisionByProperty({ collides: false });
 
     
 
@@ -684,7 +687,7 @@ this.enemy1Sound.setVolume(0); // Start at 0 volume to avoid abrupt noise
     this.bg7 = this.add.image(0, 0, "bg7").setOrigin(0, 0).setDepth(-4);
     this.bg8 = this.add.image(0, 0, "bg8").setOrigin(0, 0).setDepth(-3);
     this.bg9 = this.add.image(0, 0, "bg9").setOrigin(0, 0).setDepth(-2);
-    this.bg10 = this.add.image(0, 0, "bg10").setOrigin(0, 0).setDepth(-1);
+    this.bg10 = this.add.image(0, 0, "bg10").setOrigin(0, 0).setDepth(-2);
     this.bg11 = this.add.image(0, 0, "bg11").setOrigin(0, 0).setDepth(0);
     this.bg12 = this.add.image(100, 0, "bg12").setOrigin(0, 0).setDepth(1);
 
@@ -1006,36 +1009,44 @@ this.hasDoubleJumped = false; // Tracks if the double jump has been used
         player.clearTint();
       });
 
-      // ⏳ **Control movement lock and animation recovery**
-      this.time.delayedCall(2500, () => {
-        player.isInvulnerable = false;
 
-        // ✅ Ensure the player transitions to the correct animation state
-        if (player.body.velocity.y > 0) {
-          player.play("fall", true);
-        } else if (player.body.velocity.y < 0) {
-          player.play("jump", true);
-        } else if (this.cursors.left.isDown || this.cursors.right.isDown) {
-          player.play("run", true);
-        } else {
-          player.play("idle", true);
-        }
+
+      if (this.player.hp > 0) {  
+        // 🎯 Le joueur est en vie : il devient invulnérable pendant 1 seconde
+        this.player.isInvulnerable = true;  
+        this.time.delayedCall(1000, () => {  // ⏳ 1 seconde d'invulnérabilité
+            this.player.isInvulnerable = false;
+
+            if (player.body.velocity.y > 0) {
+              player.play("fall", true);
+            } else if (player.body.velocity.y < 0) {
+              player.play("jump", true);
+            } else if (this.cursors.left.isDown || this.cursors.right.isDown) {
+              player.play("run", true);
+            } else {
+              player.play("idle", true);
+            }
+        });
+    } else {  
+        // 💀 Le joueur est mort : invulnérabilité de 5 secondes
+        this.player.isDead = true;
+        this.player.setVelocity(0); // Empêcher tout mouvement
+        this.player.anims.play("player_death", true);
+    
+        this.player.isInvulnerable = true; // Empêche d'autres interactions
+
+        this.enemies.getChildren().forEach(enemy => {
+          enemy.setVelocityX(0); // Arrête le mouvement
+          enemy.isAttacking = false; // Désactive l'attaque
+          enemy.anims.play("enemy_idle", true); // Passe en animation idle (facultatif)
       });
 
-      // ✅ Check for player death
-      if (player.hp <= 0 && !player.isDead) {
-        player.isDead = true;
-        player.setVelocity(0, 0);
-        
- 
-        player.anims.play("player_death", true); // Play death animation
-        console.log ("player_death");
-
-        // ⏳ Delay before restarting the scene
-        this.time.delayedCall(2500, () => {
-          this.scene.start("Accueil");
+        this.time.delayedCall(5000, () => {  // ⏳ 5 secondes d'invulnérabilité après la mortd
+            this.scene.start("Accueil"); // Redémarrage après 5s
         });
-      }
+    }
+    
+    
     }
   }
 
@@ -1349,7 +1360,9 @@ this.hasDoubleJumped = false; // Tracks if the double jump has been used
     let cameraY = this.cameras.main.scrollY;
 
     const scrollX = this.cameras.main.scrollX;
-    [
+
+    // Reverse the speed order so far layers move slower, close layers move faster
+    const backgrounds = [
       this.bg1,
       this.bg2,
       this.bg3,
@@ -1362,14 +1375,27 @@ this.hasDoubleJumped = false; // Tracks if the double jump has been used
       this.bg10,
       this.bg11,
       this.bg12,
-    ].forEach((bg, index) => {
-      bg.x = scrollX * (0.09 + index * 0.01);
+    ];
+
+    // Adjust speeds: farther layers (bg1) move the slowest, closer (bg12) move fastest
+    backgrounds.forEach((bg, index) => {
+        const factor = 0.02 + (backgrounds.length - index) * 0.02; // Reverse order
+        bg.x = scrollX * factor;
     });
-  }
+}
 
   // ENEMIES
   // ------------------------------------------------------
   updateEnnemies() {
+    // Vérifier si le joueur est mort et arrêter les ennemis
+    if (this.player.isDead) {
+        this.enemies.children.iterate((enemy) => {
+            enemy.setVelocityX(0);
+            enemy.play("enemy_idle", true);
+        });
+        return; // Sortir de la fonction pour empêcher tout autre comportement
+    }
+
     this.enemies.children.iterate((enemy) => {
       if (enemy.hp > 0) {
         const distanceToPlayer = Phaser.Math.Distance.Between(
@@ -1391,7 +1417,8 @@ this.hasDoubleJumped = false; // Tracks if the double jump has been used
           enemy.setVelocityX(0);
           enemy.isAttacking = true;
           enemy.play("enemy_attack", true);
-          this.sound.play("mushroomAttack", { volume: 3 }); // Play potion pickup sound
+          this.sound.play("mushroomAttack", { volume: 3 });
+
           enemy.flipX = this.player.x > enemy.x;
 
           enemy.on("animationupdate", (anim, frame) => {
@@ -1410,24 +1437,25 @@ this.hasDoubleJumped = false; // Tracks if the double jump has been used
               ) {
                 this.dealDamage(this.player);
 
-                // Apply faster knockback to player
+                // Appliquer le knockback seulement si le joueur est vivant
                 if (!this.player.isDead) {
-                  const knockback = 50; // Increased knockback speed
+                  const knockback = 50;
                   const direction = this.player.x < enemy.x ? -1 : 1;
                   this.player.setVelocityX(knockback * direction);
                 } else {
-                  // Stop the player's movement shortly after being knocked back
+                  // Arrêter totalement le mouvement du joueur après la mort
                   this.time.delayedCall(300, () => {
                     this.player.setVelocity(0, 0);
                   });
                 }
-                }
-                }
-                });
+              }
+            }
+          });
 
           enemy.once("animationcomplete", () => {
             enemy.isAttacking = false;
           });
+
         } else if (!enemy.isAttacking) {
           if (distanceToPlayer < 100) {
             enemy.setVelocityX(this.player.x < enemy.x ? -50 : 50);
@@ -1444,7 +1472,7 @@ this.hasDoubleJumped = false; // Tracks if the double jump has been used
         }
       }
     });
-  }
+}
 
   update() {
     if(!this.player.isDead )this.updatePlayer();
