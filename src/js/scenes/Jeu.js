@@ -23,6 +23,8 @@ class Jeu extends Phaser.Scene {
 
     // Load Heart images
     this.load.image("texte_debut", "./images/texte_debut 2.png");
+    this.load.image('texte_debut_1', "./images/texte_debut 1.png");
+
     
     // Load Heart images
     this.load.image("hp_5", "./images/coeur_5.png");
@@ -63,6 +65,13 @@ class Jeu extends Phaser.Scene {
       frameWidth: 32,
       frameHeight: 96,
     });
+
+    // Load npc Spritesheets
+this.load.spritesheet("npc", "./sprites/npc.png", {
+  frameWidth: 30,
+  frameHeight: 40
+});
+  
 
     // Load Player Spritesheets
     this.load.spritesheet(
@@ -276,6 +285,17 @@ skyLayer.setCollisionByProperty({ collides: false });
     this.physics.add.collider(this.player, platformsLayer);
     this.physics.add.collider(this.player, landLayer);
 
+
+
+// npc animation
+this.anims.create({
+  key: 'npc_idle',
+  frames: this.anims.generateFrameNumbers('npc', { start: 0, end: 4 }),
+  frameRate: 6,
+  repeat: -1
+});
+    
+    
     // Create Player Animations
     this.anims.create({
       key: "idle",
@@ -361,6 +381,23 @@ skyLayer.setCollisionByProperty({ collides: false });
       repeat: 10,
     });
     this.player.play("idle");
+
+
+
+    // Create NPCs from Tiled
+this.npcs = this.physics.add.group();
+const npcLayer = map.getObjectLayer('npc');
+npcLayer.objects.forEach((obj) => {
+    let npc = this.npcs.create(obj.x, obj.y, 'npc');
+    npc.setImmovable(true); // Stops it from moving when the player touches it
+npc.body.allowGravity = false; // Stops it from falling due to gravity
+npc.setVelocity(0); // Stops it from moving entirely
+    npc.setScale(1);
+    npc.setDepth(5);
+    npc.play('npc_idle', true);
+});
+
+
 
     // -------------------- 🗡️ Original Enemy (Mushroom) --------------------
 
@@ -794,6 +831,24 @@ this.enemy1Sound.setVolume(0); // Start at 0 volume to avoid abrupt noise
       this.inputHandler.gamepad = pad;
       console.log("🎮 Gamepad Connected:", pad.id);
     });
+
+    // -------------------- NPC MESSAGE --------------------
+    this.dialogueImage = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, 'texte_debut_1');
+    this.dialogueImage.setOrigin(1).setScale(0.35);
+    
+    this.dialogueImage.setVisible(false);
+    
+    this.physics.add.overlap(
+      this.player,
+      this.npcs, // ✅ Use the NPC group
+      () => {
+          this.showDialogue();
+      },
+      null,
+      this
+  );
+  
+  
     
     
   // -------------------- KING MESSAGE --------------------
@@ -864,6 +919,39 @@ this.hasDoubleJumped = false; // Tracks if the double jump has been used
 
 
   }
+
+  showDialogue() {
+    if (this.canDismissImage) return; // Prevent triggering multiple times
+    
+    this.dialogueImage.setVisible(true);
+    this.dialogueImage.setDepth(100);
+    this.dialogueImage.setAlpha(0); // Start invisible
+    
+    // Place at the center of the CAMERA (not the world)
+    this.dialogueImage.setPosition(
+        this.cameras.main.worldView.x + this.cameras.main.width / 2,
+        this.cameras.main.worldView.y + this.cameras.main.height / 2
+    );
+
+    // Fade-in effect + move up slightly
+    this.tweens.add({
+        targets: this.dialogueImage,
+        alpha: 1, // Fully visible
+        y: this.cameras.main.worldView.y + this.cameras.main.height / 2 - 50, // Move up slightly
+        duration: 1000, // Duration of the fade-in + move up
+        ease: 'Linear'
+    });
+
+    // Prevent removal until cooldown is over
+    this.canDismissImage = false;
+
+    // Start a cooldown before allowing the player to remove the message
+    this.time.delayedCall(3000, () => {
+        this.canDismissImage = true; // Allow removal after 3 seconds
+    });
+}
+
+
   
   removeStartScreen() {
     if (this.startScreen) {
