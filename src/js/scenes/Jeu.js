@@ -233,6 +233,10 @@ class Jeu extends Phaser.Scene {
     }
 
     
+skyLayer.setDepth(0);         // Sky at the back
+landLayer.setDepth(0);         // Land behind platforms and structure
+platformsLayer.setDepth(0);     // Platforms in front of land
+decorationLayer.setDepth(0);    // Structure/decoration at the front
     
 
 // ✅ Désactiver la collision pour la décoration
@@ -1040,6 +1044,9 @@ this.hasDoubleJumped = false; // Tracks if the double jump has been used
           enemy.isAttacking = false; // Désactive l'attaque
           enemy.anims.play("enemy_idle", true); // Passe en animation idle (facultatif)
       });
+
+            // 🖥️ Start fade-out effect when player dies
+            this.cameras.main.fadeOut(5000, 0, 0, 0); // 1000ms duration, black fade
 
         this.time.delayedCall(5000, () => {  // ⏳ 5 secondes d'invulnérabilité après la mortd
             this.scene.start("Accueil"); // Redémarrage après 5s
