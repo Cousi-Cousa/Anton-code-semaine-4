@@ -1,5 +1,11 @@
 {
   "dependencies": {
     "phaser": "^3.80.1"
+  },
+  "name": "arcadia",
+  "main": "index.html",
+  "window": {
+    "fullscreen": true,
+    "frame": false
   }
 }

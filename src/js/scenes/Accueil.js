@@ -58,7 +58,7 @@ class Accueil extends Phaser.Scene {
         const commencerBtn = this.add.image(955, 550, 'btnCommencer').setInteractive().setScale(1.3);
         commencerBtn.on('pointerover', () => commencerBtn.setTexture('btnCommencerDark'));
         commencerBtn.on('pointerout', () => commencerBtn.setTexture('btnCommencer'));
-        commencerBtn.on('pointerdown', () => this.scene.start('CommentJouer')); // Go to the new intermediate scene first
+        commencerBtn.on('pointerdown', () => this.scene.start('Jeu')); // Go to the new intermediate scene first
         this.tweens.add({
             targets: commencerBtn,
             y: 560,
@@ -99,7 +99,7 @@ class Accueil extends Phaser.Scene {
         // Fade out and change scene after delay
         this.cameras.main.fadeOut(1000);
         this.time.delayedCall(1000, () => {
-            this.scene.start("CommentJouer");
+            this.scene.start("Jeu");
         });
             
         }

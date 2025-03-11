@@ -22,9 +22,11 @@ class Jeu extends Phaser.Scene {
     }
 
     // Load Heart images
-    this.load.image("texte_debut", "./images/texte_debut 2.png");
-    this.load.image('texte_npc', "./images/texte_debut 1.png");
+    this.load.image("texte_debut", "./images/texte_debut.png");
 
+    this.load.image('texte_npc_1', "./images/texte_lavar_1.png");
+    this.load.image('texte_npc_2', "./images/texte_lavar_2.png");
+    this.load.image('texte_npc_3', "./images/texte_lavar_3.png");
 
     // Load Heart images
     this.load.image("hp_5", "./images/coeur_5.png");
@@ -68,8 +70,8 @@ class Jeu extends Phaser.Scene {
 
     // Load npc Spritesheets
     this.load.spritesheet("npc", "./sprites/npc.png", {
-      frameWidth: 30,
-      frameHeight: 40
+      frameWidth: 29.8,
+      frameHeight: 38
     });
 
 
@@ -219,18 +221,91 @@ class Jeu extends Phaser.Scene {
 
 
       this.playerCanMove = false;
-
+      this.texteNpc1 = this.add.image(2240, 565, 'texte_npc_1');
+      this.texteNpc1.setScale(0.35).setAlpha(0);
       // ✅ Affiche le texte
-      this.texteNpc.setVisible(true);
-      this.texteNpcCount = 1;
+      this.textNpcAnimationComplete = false;
 
+      this.tweens.add({
+        targets: this.texteNpc1,
+        alpha: 1, // Fully visible
+        y: this.cameras.main.centerY - 0, // Move up
+        duration: 850, // Fade-in & move-up duration (.850 sec)
+        ease: 'Linear',
+        onComplete: () => {
+          this.textNpcAnimationComplete = true;
+        }
+      });
+      this.texteNpcCount = 1;
+      
     } else if (this.texteNpcCount == 1) {
+      this.texteNpc2 = this.add.image(2240, 565, 'texte_npc_2');
+      this.texteNpc2.setScale(0.35).setAlpha(0);
+
+      this.textNpcAnimationComplete = false;
+
+      this.tweens.add({
+        targets: this.texteNpc1,
+        alpha: 0, // Fully visible
+        y: this.cameras.main.centerY + 50, // Move up
+        duration: 850, // Fade-in & move-up duration (.850 sec)
+        ease: 'Linear',
+        onComplete: () => {
+          this.tweens.add({
+            targets: this.texteNpc2,
+            alpha: 1, // Fully visible
+            y: this.cameras.main.centerY - 0, // Move down
+            duration: 850, // Fade-in & move-up duration (.850 sec)
+            ease: 'Linear',
+            onComplete: () => {
+              this.textNpcAnimationComplete = true;
+            }
+          });
+        }
+      });
+
       this.texteNpcCount = 2;
+
     } else if (this.texteNpcCount == 2) {
+      this.texteNpc3 = this.add.image(2240, 565, 'texte_npc_3');
+      this.texteNpc3.setScale(0.35).setAlpha(0);
+      this.textNpcAnimationComplete = false;
+
+      this.tweens.add({
+        targets: this.texteNpc2,
+        alpha: 0, // Fully visible
+        y: this.cameras.main.centerY + 50, // Move up
+        duration: 850, // Fade-in & move-up duration (.850 sec)
+        ease: 'Linear',
+        onComplete: () => {
+          this.tweens.add({
+            targets: this.texteNpc3,
+            alpha: 1, // Fully visible
+            y: this.cameras.main.centerY - 0, // Move down
+            duration: 850, // Fade-in & move-up duration (.850 sec)
+            ease: 'Linear',
+            onComplete: () => {
+              this.textNpcAnimationComplete = true;
+            }
+          });
+        }
+      });
       this.texteNpcCount = 3;
+
     } else if (this.texteNpcCount > 2) {
+      this.textNpcAnimationComplete = false;
+      this.tweens.add({
+        targets: this.texteNpc3,
+        alpha: 0, // Fully visible
+        y: this.cameras.main.centerY + 50, // Move down
+        duration: 850, // Fade-in & move-up duration (.850 sec)
+        ease: 'Linear',
+        onComplete: () => {
+          this.textNpcAnimationComplete = true;
+        }
+      });
+
       this.playerCanMove = true;
-      this.texteNpc.setVisible(false);
       this.texteNpcCount = 0;
     }
 
@@ -438,15 +513,23 @@ class Jeu extends Phaser.Scene {
     npcLayer.objects.forEach((obj) => {
       let npc = this.npcs.create(obj.x, obj.y, 'npc');
       npc.setScale(1);
-      npc.setDepth(5);
+      npc.setDepth(0);
       npc.play('npc_idle', true);
     });
 
     this.npc = this.physics.add.sprite(400, 300, 'npc');
     this.npc.setImmovable(true);
 
-    this.texteNpc = this.add.image(400, 300, 'texte_npc');
-    this.texteNpc.setVisible(false);
+    this.texteNpc1 = this.add.image(2240, 550, 'texte_npc_1');
+    this.texteNpc1.setScale(0.35).setAlpha(0);
+
+    /*this.texteNpc1.setOrigin(2.3, 0);*/
+
+    this.texteNpc2 = this.add.image(400, 300, 'texte_npc_2');
+    this.texteNpc2.setScale(0.35).setVisible(false);
+
+    this.texteNpc3 = this.add.image(400, 300, 'texte_npc_3');
+    this.texteNpc3.setScale(0.35).setVisible(false);
 
 
     this.physics.add.overlap(this.player, this.npcs, (player, npc) => {
@@ -456,7 +539,7 @@ class Jeu extends Phaser.Scene {
 
     });
 
-
+    this.textNpcAnimationComplete = true;
 
 
     // -------------------- 🗡️ Original Enemy (Mushroom) --------------------
@@ -828,7 +911,7 @@ class Jeu extends Phaser.Scene {
     this.cameras.main.startFollow(this.player, true, 0.05, 0.02);
 
     // -------------------- ❤️ Player Setup --------------------
-    this.player.hp = 2;
+    this.player.hp = 5;
     this.player.isInvulnerable = false;
     this.player.play("idle");
 
@@ -1154,6 +1237,7 @@ class Jeu extends Phaser.Scene {
         this.player.isDead = true;
         this.player.setVelocity(0); // Empêcher tout mouvement
         this.player.anims.play("player_death", true);
+        this.walkSound.stop();
 
         this.player.isInvulnerable = true; // Empêche d'autres interactions
 
@@ -1242,10 +1326,6 @@ class Jeu extends Phaser.Scene {
     // Jump: Use JustDown() for keyboard and check gamepad button (Button A = index 0)
 
 
-    if (this.playerCanMove == false) {
-      moveLeft = 0;
-      moveRight = 0;
-    }
 
     // MANAGE GAMEPAD BUTTON 0 JUST DOWN
     let gemePadButton0JustPressed = false;
@@ -1264,6 +1344,12 @@ class Jeu extends Phaser.Scene {
       console.log("Jump input");
       this.jump = true;
 
+    }
+
+    if (this.playerCanMove == false) {
+      moveLeft = 0;
+      moveRight = 0;
+      this.jump = false;
     }
 
     // MANAGE GAMEPAD BUTTON 1 JUST DOWN
@@ -1334,7 +1420,6 @@ class Jeu extends Phaser.Scene {
           }
         }
       }
-
       // Keep hitbox aligned when idle
       this.player.body.setOffset(this.lastDirection === "left" ? 54 : 44, 40);
 
@@ -1429,7 +1514,10 @@ class Jeu extends Phaser.Scene {
 
       if (this.physics.overlap(this.player, this.npcs)) {
         console.log("NPC");
-        this.displayNpcText();
+        
+        if(this.textNpcAnimationComplete == true){
+          this.displayNpcText();
+        }
       } else {
         console.log("Attack triggered");
         this.canAttack = false; // Prevent attacking again immediately
