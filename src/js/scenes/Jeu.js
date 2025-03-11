@@ -385,6 +385,9 @@ this.anims.create({
   repeat: -1
 });
 
+// ✅ Contrôle de mouvement du joueur
+let playerCanMove = true;
+
 // Create NPCs from Tiled
 this.npcs = this.physics.add.group();
 const npcLayer = map.getObjectLayer('npc');
@@ -401,7 +404,30 @@ this.npc.setImmovable(true);
 this.texteNpc = this.add.image(400, 300, 'texte_npc');
 this.texteNpc.setVisible(false);
 
+this.physics.add.overlap(this.player, this.npcs, (player, npc) => {
+  playerCanMove = false;
+  this.player.setVelocity(0);
+  if (!this.texteNpc.visible) {
 
+     // ✅ Affiche le texte
+    this.texteNpc.setVisible(true);
+  }
+
+
+  this.events.on('update', () => {
+    if (this.attack) { // If attack is triggered in your existing system
+      this.texteNpc.setVisible(false);
+    }
+});
+
+// Keep gamepad support (even if it’s not working yet)
+this.input.gamepad?.on('down', (pad, button) => {
+    if (button.index === 1) { // Button 1 (attack)
+      this.texteNpc.setVisible(false);
+    }
+  });
+
+});
     
 
     // -------------------- 🗡️ Original Enemy (Mushroom) --------------------
@@ -1353,37 +1379,6 @@ this.hasDoubleJumped = false; // Tracks if the double jump has been used
         this.player.play("jump_fall_transition", true);
       }
     }
-
-    // ✅ Contrôle de mouvement du joueur
-let playerCanMove = true;
-
-    this.physics.add.overlap(this.player, this.npcs, (player, npc) => {
-      playerCanMove = false;
-      this.player.setVelocity(0);
-      if (!this.texteNpc.visible) {
-    
-         // ✅ Affiche le texte
-        this.texteNpc.setVisible(true);
-    
-    // ❌ Désactiver le mouvement du joueur
-    playerCanMove = false;
-    this.player.setVelocity(0);
-      }
-    
-    
-      this.events.on('update', () => {
-        if (this.attack) { // If attack is triggered in your existing system
-          this.texteNpc.setVisible(false);
-        }
-    });
-    
-    // Keep gamepad support (even if it’s not working yet)
-    this.input.gamepad?.on('down', (pad, button) => {
-        if (button.index === 1) { // Button 1 (attack)
-          this.texteNpc.setVisible(false);
-        }
-      });
-    });
 
     // ATTACK
     // ------------------------------------------------------
