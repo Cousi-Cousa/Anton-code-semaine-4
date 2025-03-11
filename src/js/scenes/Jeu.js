@@ -25,7 +25,7 @@ class Jeu extends Phaser.Scene {
     this.load.image("texte_debut", "./images/texte_debut 2.png");
     this.load.image('texte_npc', "./images/texte_debut 1.png");
 
-    
+
     // Load Heart images
     this.load.image("hp_5", "./images/coeur_5.png");
     this.load.image("hp_4", "./images/coeur_4.png");
@@ -67,11 +67,11 @@ class Jeu extends Phaser.Scene {
     });
 
     // Load npc Spritesheets
-this.load.spritesheet("npc", "./sprites/npc.png", {
-  frameWidth: 30,
-  frameHeight: 40
-});
-  
+    this.load.spritesheet("npc", "./sprites/npc.png", {
+      frameWidth: 30,
+      frameHeight: 40
+    });
+
 
     // Load Player Spritesheets
     this.load.spritesheet(
@@ -125,10 +125,10 @@ this.load.spritesheet("npc", "./sprites/npc.png", {
       frameHeight: 80,
     });
     this.load.spritesheet("player_death", "./player_spritesheet/Death.png", {
-      frameWidth: 120, 
+      frameWidth: 120,
       frameHeight: 80
-  });
-  
+    });
+
     // Load Enemy Spritesheets
     this.load.spritesheet("enemy_idle", "./sprites/Mushroom-Idle.png", {
       frameWidth: 80,
@@ -205,8 +205,37 @@ this.load.spritesheet("npc", "./sprites/npc.png", {
     this.load.audio("mushroomAttack", "sounds/attaque_champignon_test 5.wav");
     this.load.audio("rubisSound", "sounds/ambiance_artefact_reaper 1.wav");
 
-    
-    
+
+
+  }
+
+  displayNpcText() {
+
+    this.texteNpcShown = true;
+
+    console.log("Display NPC text " + this.texteNpcCount);
+    if (this.texteNpcCount == 0) {
+
+
+
+      this.playerCanMove = false;
+
+      // ✅ Affiche le texte
+      this.texteNpc.setVisible(true);
+      this.texteNpcCount = 1;
+
+    } else if (this.texteNpcCount == 1) {
+      this.texteNpcCount = 2;
+    } else if (this.texteNpcCount == 2) {
+      this.texteNpcCount = 3;
+    } else if (this.texteNpcCount > 2) {
+      this.playerCanMove = true;
+      this.texteNpc.setVisible(false);
+      this.texteNpcCount = 0;
+    }
+
+
+
   }
 
   create() {
@@ -228,36 +257,44 @@ this.load.spritesheet("npc", "./sprites/npc.png", {
     const landTiles = map.addTilesetImage("land", "land");
     const decorationTiles = map.addTilesetImage("decoration", "decoration"); // ✅ Ajout du tileset de décoration
 
-    
+
 
     // Apply tilesets to layers
-    
+
     const skyLayer = map.createLayer("sky", decorationTiles, 0, 0); // Sky should be created FIRST
     const landLayer = map.createLayer("land", [tileset, tileset1, landTiles, decorationTiles], 0, 0); // ✅ Ajout du décor dans le sol
     const platformsLayer = map.createLayer("platforms", platformTiles, 0, 0);
     const decorationLayer = map.createLayer("structure", decorationTiles, 0, 0);
-    
+
     if (!decorationLayer) {
-        console.error("❌ Decoration layer failed to load.");
+      console.error("❌ Decoration layer failed to load.");
     }
 
-    
-skyLayer.setDepth(0);         // Sky at the back
-landLayer.setDepth(0);         // Land behind platforms and structure
-platformsLayer.setDepth(0);     // Platforms in front of land
-decorationLayer.setDepth(0);    // Structure/decoration at the front
-    
 
-// ✅ Désactiver la collision pour la décoration
-decorationLayer.setDepth(-1); // Mettre en arrière-plan
-decorationLayer.setCollisionByProperty({ collides: false });
+    skyLayer.setDepth(0); // Sky at the back
+    landLayer.setDepth(0); // Land behind platforms and structure
+    platformsLayer.setDepth(0); // Platforms in front of land
+    decorationLayer.setDepth(0); // Structure/decoration at the front
 
-// ✅ Activer la collision uniquement pour le sol et les plateformes
-landLayer.setCollisionByProperty({ collides: true });
-platformsLayer.setCollisionByProperty({ collides: true });
-skyLayer.setCollisionByProperty({ collides: false });
 
-    
+    // ✅ Désactiver la collision pour la décoration
+    decorationLayer.setDepth(-1); // Mettre en arrière-plan
+    decorationLayer.setCollisionByProperty({
+      collides: false
+    });
+
+    // ✅ Activer la collision uniquement pour le sol et les plateformes
+    landLayer.setCollisionByProperty({
+      collides: true
+    });
+    platformsLayer.setCollisionByProperty({
+      collides: true
+    });
+    skyLayer.setCollisionByProperty({
+      collides: false
+    });
+
+
 
     // Enable Collision for Platforms
     landLayer.setCollisionByProperty({
@@ -268,7 +305,7 @@ skyLayer.setCollisionByProperty({ collides: false });
     });
 
 
-    
+
 
     // Set World and Camera Bounds
     this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
@@ -288,8 +325,8 @@ skyLayer.setCollisionByProperty({ collides: false });
 
 
 
-    
-    
+
+
     // Create Player Animations
     this.anims.create({
       key: "idle",
@@ -357,14 +394,14 @@ skyLayer.setCollisionByProperty({ collides: false });
     this.anims.create({
       key: "player_death",
       frames: this.anims.generateFrameNumbers("player_death", {
-          start: 0,
-          end: 19 
+        start: 0,
+        end: 19
       }),
       frameRate: 10,
       repeat: 0,
 
-  });
-  
+    });
+
     this.anims.create({
       key: "player_hit",
       frames: this.anims.generateFrameNumbers("player_hit", {
@@ -378,57 +415,49 @@ skyLayer.setCollisionByProperty({ collides: false });
 
 
     // Create animation
-this.anims.create({
-  key: 'npc_idle',
-  frames: this.anims.generateFrameNumbers('npc', { start: 0, end: 5 }),
-  frameRate: 6,
-  repeat: -1
-});
+    this.anims.create({
+      key: 'npc_idle',
+      frames: this.anims.generateFrameNumbers('npc', {
+        start: 0,
+        end: 5
+      }),
+      frameRate: 6,
+      repeat: -1
+    });
 
-// ✅ Contrôle de mouvement du joueur
-let playerCanMove = true;
+    // ✅ Contrôle de mouvement du joueur
+    this.playerCanMove = true;
 
-// Create NPCs from Tiled
-this.npcs = this.physics.add.group();
-const npcLayer = map.getObjectLayer('npc');
-npcLayer.objects.forEach((obj) => {
-  let npc  = this.npcs.create(obj.x, obj.y, 'npc');
-  npc.setScale(1);
-  npc.setDepth(5);
-  npc.play('npc_idle', true);
-});
+    this.texteNpcShown = false;
 
-this.npc = this.physics.add.sprite(400, 300, 'npc');
-this.npc.setImmovable(true);
+    this.texteNpcCount = 0;
 
-this.texteNpc = this.add.image(400, 300, 'texte_npc');
-this.texteNpc.setVisible(false);
+    // Create NPCs from Tiled
+    this.npcs = this.physics.add.group();
+    const npcLayer = map.getObjectLayer('npc');
+    npcLayer.objects.forEach((obj) => {
+      let npc = this.npcs.create(obj.x, obj.y, 'npc');
+      npc.setScale(1);
+      npc.setDepth(5);
+      npc.play('npc_idle', true);
+    });
 
-this.physics.add.overlap(this.player, this.npcs, (player, npc) => {
-  playerCanMove = false;
-  this.player.setVelocity(0);
-  if (!this.texteNpc.visible) {
+    this.npc = this.physics.add.sprite(400, 300, 'npc');
+    this.npc.setImmovable(true);
 
-     // ✅ Affiche le texte
-    this.texteNpc.setVisible(true);
-  }
+    this.texteNpc = this.add.image(400, 300, 'texte_npc');
+    this.texteNpc.setVisible(false);
 
 
-  this.events.on('update', () => {
-    if (this.attack) { // If attack is triggered in your existing system
-      this.texteNpc.setVisible(false);
-    }
-});
+    this.physics.add.overlap(this.player, this.npcs, (player, npc) => {
+      if (this.texteNpcShown == false) {
+        this.displayNpcText();
+      }
 
-// Keep gamepad support (even if it’s not working yet)
-this.input.gamepad?.on('down', (pad, button) => {
-    if (button.index === 1) { // Button 1 (attack)
-      this.texteNpc.setVisible(false);
-    }
-  });
+    });
 
-});
-    
+
+
 
     // -------------------- 🗡️ Original Enemy (Mushroom) --------------------
 
@@ -490,17 +519,17 @@ this.input.gamepad?.on('down', (pad, button) => {
     this.physics.add.collider(this.enemies, platformsLayer);
 
     // Load the enemy sound in the create function
-this.enemy1Sound = this.sound.add("rubisSound", {
-  loop: true // Ensures the sound loops
-});
+    this.enemy1Sound = this.sound.add("rubisSound", {
+      loop: true // Ensures the sound loops
+    });
 
 
-// Start the sound **only when the player is close enough**
-this.soundPlaying = false; // Track if sound is playing
+    // Start the sound **only when the player is close enough**
+    this.soundPlaying = false; // Track if sound is playing
 
-// Play the sound at 100% volume initially (optional)
-this.enemy1Sound.play();
-this.enemy1Sound.setVolume(0); // Start at 0 volume to avoid abrupt noise
+    // Play the sound at 100% volume initially (optional)
+    this.enemy1Sound.play();
+    this.enemy1Sound.setVolume(0); // Start at 0 volume to avoid abrupt noise
 
     // this.enemy.play("enemy_idle");
 
@@ -548,25 +577,25 @@ this.enemy1Sound.setVolume(0); // Start at 0 volume to avoid abrupt noise
       slime.setScale(0.5); // Resize slime to make it smaller
 
       // Reverse direction every 2 seconds
-   this.time.addEvent({
-     delay: 3000, // Time in milliseconds (2s)
-     loop: true,
-     callback: () => {
-         slime.setVelocityX(slime.body.velocity.x * -1); // Reverse direction
-     }
- });
- 
- this.slimes.getChildren().forEach((slime) => {
-  slime.setSize(35, 20); // Adjust width and height of the hitbox
-  slime.setOffset(30, 10); // Move hitbox inside the sprite (if needed)
-});
- 
-      
+      this.time.addEvent({
+        delay: 3000, // Time in milliseconds (2s)
+        loop: true,
+        callback: () => {
+          slime.setVelocityX(slime.body.velocity.x * -1); // Reverse direction
+        }
+      });
+
+      this.slimes.getChildren().forEach((slime) => {
+        slime.setSize(35, 20); // Adjust width and height of the hitbox
+        slime.setOffset(30, 10); // Move hitbox inside the sprite (if needed)
+      });
+
+
       slime.homeX = obj.x; // Store initial position
       slime.patrolRange = 80; // Slime will move 100 pixels left & right from home
       slime.speed = 50; // Adjust speed
       slime.direction = 1; // 1 for right, -1 for left
- 
+
       slime.play("slime_move", true);
     });
     this.physics.add.collider(this.slimes, platformsLayer);
@@ -638,11 +667,11 @@ this.enemy1Sound.setVolume(0); // Start at 0 volume to avoid abrupt noise
       questLayer.objects.forEach((obj) => {
         const questItem = this.questItems.create(
           obj.x,
-          obj.y -16,
+          obj.y - 16,
           "questItemSheet"
         );
 
-        
+
         questItem.setOrigin(0, 0).setScale(1);
         questItem.body.setAllowGravity(false);
         questItem.setData("collected", false); // Mark it as not yet collected
@@ -715,10 +744,13 @@ this.enemy1Sound.setVolume(0); // Start at 0 volume to avoid abrupt noise
     );
     this.rubisText.setOrigin(0.5, 1);
     this.rubisText.setVisible(false); // Hide initially
-    
-    this.rubisSound = this.sound.add("rubisSound", { loop: true, volume: 0 });
+
+    this.rubisSound = this.sound.add("rubisSound", {
+      loop: true,
+      volume: 0
+    });
     this.rubisSoundPlaying = false; // Ensure it's not playing by default
-   
+
 
     // ---------------- ENDING ----------------
 
@@ -729,7 +761,7 @@ this.enemy1Sound.setVolume(0); // Start at 0 volume to avoid abrupt noise
     //}
 
     this.physics.add.overlap(this.player, this.rubisGroup, (player, rubis) => {
-      if (this.collectedQuestItems >= 3 && this.attack ) {
+      if (this.collectedQuestItems >= 3 && this.attack) {
         console.log("✅ Ending triggered by gamepad!");
         this.triggerEnding();
       }
@@ -864,70 +896,70 @@ this.enemy1Sound.setVolume(0); // Start at 0 volume to avoid abrupt noise
     });
 
 
-  
-    
-    
-  // -------------------- KING MESSAGE --------------------
-  // Add the starting image
-  this.startScreen = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, 'texte_debut')
-    .setOrigin(2.3, 0)
-    .setScale(0.35)
-    .setDepth(100) // Ensures it appears on top of everything
-    .setAlpha(0); // Start invisible
 
-// Fade-in effect + move up slightly
-this.tweens.add({
-  targets: this.startScreen,
-  alpha: 1, // Fully visible
-  y: this.cameras.main.centerY - 50, // Move up
-  duration: 1000, // Fade-in & move-up duration (1 sec)
-  ease: 'Linear'
-});
-// Prevent interaction before the cooldown is over
-this.canDismissImage = false;
 
-// Start a 3-second cooldown before the player can remove the image
-this.time.delayedCall(3000, () => {
-  this.canDismissImage = true; // After 3 sec, allow image removal
-}, [], this);
 
-// Function to fade out + move down when attack is used
-const removeStartScreen = () => {
-  if (this.canDismissImage) {
-      this.tweens.add({
+    // -------------------- KING MESSAGE --------------------
+    // Add the starting image
+    this.startScreen = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, 'texte_debut')
+      .setOrigin(2.3, 0)
+      .setScale(0.35)
+      .setDepth(100) // Ensures it appears on top of everything
+      .setAlpha(0); // Start invisible
+
+    // Fade-in effect + move up slightly
+    this.tweens.add({
+      targets: this.startScreen,
+      alpha: 1, // Fully visible
+      y: this.cameras.main.centerY - 50, // Move up
+      duration: 1000, // Fade-in & move-up duration (1 sec)
+      ease: 'Linear'
+    });
+    // Prevent interaction before the cooldown is over
+    this.canDismissImage = false;
+
+    // Start a 3-second cooldown before the player can remove the image
+    this.time.delayedCall(3000, () => {
+      this.canDismissImage = true; // After 3 sec, allow image removal
+    }, [], this);
+
+    // Function to fade out + move down when attack is used
+    const removeStartScreen = () => {
+      if (this.canDismissImage) {
+        this.tweens.add({
           targets: this.startScreen,
           alpha: 0, // Fade out smoothly
           y: this.cameras.main.centerY + 50, // Move down
           duration: 1000, // Fade-out & move-down duration (1 sec)
           ease: 'Linear',
           onComplete: () => {
-              this.startScreen.destroy(); // Remove image after fade-out
+            this.startScreen.destroy(); // Remove image after fade-out
           }
-      });
-  }
-};
+        });
+      }
+    };
 
-// Check attack input in the update loop
-this.input.keyboard.on('keydown-Z', removeStartScreen); // Z key (attack)
-this.events.on('update', () => {
-    if (this.attack) { // If attack is triggered in your existing system
+    // Check attack input in the update loop
+    this.input.keyboard.on('keydown-Z', removeStartScreen); // Z key (attack)
+    this.events.on('update', () => {
+      if (this.attack) { // If attack is triggered in your existing system
         removeStartScreen();
-    }
-});
+      }
+    });
 
-// Keep gamepad support (even if it’s not working yet)
-this.input.gamepad?.on('down', (pad, button) => {
-    if (button.index === 1) { // Button 1 (attack)
+    // Keep gamepad support (even if it’s not working yet)
+    this.input.gamepad.on('down', (pad, button) => {
+      if (button.index === 1) { // Button 1 (attack)
         removeStartScreen();
-    }
-});
-    
-this.canDoubleJump = false; // Tracks if the player can double jump
-this.hasDoubleJumped = false; // Tracks if the double jump has been used
+      }
+    });
 
-    
+    this.canDoubleJump = false; // Tracks if the player can double jump
+    this.hasDoubleJumped = false; // Tracks if the double jump has been used
+
+
     this.cameras.main.fadeIn(2000); // 500ms fade-in effect
-    
+
     this.gamepadbutton1 = false;
     this.gamepadbutton0 = false;
 
@@ -938,17 +970,17 @@ this.hasDoubleJumped = false; // Tracks if the double jump has been used
 
   afficherTexteNpc() {
     if (!this.texteNpc.visible) {
-        this.texteNpc.setVisible(true);
+      this.texteNpc.setVisible(true);
       console.log('texteNPC')
-        // Optionnel : Retire l'image après quelques secondes
-        this.time.delayedCall(3000, () => {
-            this.texteNpc.setVisible(false);
-        });
+      // Optionnel : Retire l'image après quelques secondes
+      this.time.delayedCall(3000, () => {
+        this.texteNpc.setVisible(false);
+      });
     }
-}
+  }
 
 
-  
+
   removeStartScreen() {
     if (this.startScreen) {
       this.startScreen.destroy();
@@ -983,15 +1015,17 @@ this.hasDoubleJumped = false; // Tracks if the double jump has been used
 
   collectPotion(player, potion) {
     if (!potion.getData("collected") && player.hp < 5) {
-        potion.setData("collected", true);
-        potion.destroy(); // Remove from scene
+      potion.setData("collected", true);
+      potion.destroy(); // Remove from scene
 
-        // Restore HP one by one, but not beyond max HP (5)
-        player.hp++;
-        this.updateHealthBar();
-        this.sound.play("potionSound", { volume: 1.2 }); // Play potion pickup sound
+      // Restore HP one by one, but not beyond max HP (5)
+      player.hp++;
+      this.updateHealthBar();
+      this.sound.play("potionSound", {
+        volume: 1.2
+      }); // Play potion pickup sound
     }
-}
+  }
 
   /*
   collectPotion(player, potion) {
@@ -1099,45 +1133,45 @@ this.hasDoubleJumped = false; // Tracks if the double jump has been used
 
 
 
-      if (this.player.hp > 0) {  
+      if (this.player.hp > 0) {
         // 🎯 Le joueur est en vie : il devient invulnérable pendant 1 seconde
-        this.player.isInvulnerable = true;  
-        this.time.delayedCall(1000, () => {  // ⏳ 1 seconde d'invulnérabilité
-            this.player.isInvulnerable = false;
+        this.player.isInvulnerable = true;
+        this.time.delayedCall(1000, () => { // ⏳ 1 seconde d'invulnérabilité
+          this.player.isInvulnerable = false;
 
-            if (player.body.velocity.y > 0) {
-              player.play("fall", true);
-            } else if (player.body.velocity.y < 0) {
-              player.play("jump", true);
-            } else if (this.cursors.left.isDown || this.cursors.right.isDown) {
-              player.play("run", true);
-            } else {
-              player.play("idle", true);
-            }
+          if (player.body.velocity.y > 0) {
+            player.play("fall", true);
+          } else if (player.body.velocity.y < 0) {
+            player.play("jump", true);
+          } else if (this.cursors.left.isDown || this.cursors.right.isDown) {
+            player.play("run", true);
+          } else {
+            player.play("idle", true);
+          }
         });
-    } else {  
+      } else {
         // 💀 Le joueur est mort : invulnérabilité de 5 secondes
         this.player.isDead = true;
         this.player.setVelocity(0); // Empêcher tout mouvement
         this.player.anims.play("player_death", true);
-    
+
         this.player.isInvulnerable = true; // Empêche d'autres interactions
 
         this.enemies.getChildren().forEach(enemy => {
           enemy.setVelocityX(0); // Arrête le mouvement
           enemy.isAttacking = false; // Désactive l'attaque
           enemy.anims.play("enemy_idle", true); // Passe en animation idle (facultatif)
-      });
-
-            // 🖥️ Start fade-out effect when player dies
-            this.cameras.main.fadeOut(5000, 0, 0, 0); // 1000ms duration, black fade
-
-        this.time.delayedCall(5000, () => {  // ⏳ 5 secondes d'invulnérabilité après la mortd
-            this.scene.start("Accueil"); // Redémarrage après 5s
         });
-    }
-    
-    
+
+        // 🖥️ Start fade-out effect when player dies
+        this.cameras.main.fadeOut(5000, 0, 0, 0); // 1000ms duration, black fade
+
+        this.time.delayedCall(5000, () => { // ⏳ 5 secondes d'invulnérabilité après la mortd
+          this.scene.start("Accueil"); // Redémarrage après 5s
+        });
+      }
+
+
     }
   }
 
@@ -1208,6 +1242,11 @@ this.hasDoubleJumped = false; // Tracks if the double jump has been used
     // Jump: Use JustDown() for keyboard and check gamepad button (Button A = index 0)
 
 
+    if (this.playerCanMove == false) {
+      moveLeft = 0;
+      moveRight = 0;
+    }
+
     // MANAGE GAMEPAD BUTTON 0 JUST DOWN
     let gemePadButton0JustPressed = false;
     if (gamepad) {
@@ -1216,9 +1255,9 @@ this.hasDoubleJumped = false; // Tracks if the double jump has been used
         gemePadButton0JustPressed = true;
 
       }
-      this.gamepadbutton0  = buttonPressed;
+      this.gamepadbutton0 = buttonPressed;
     }
-   
+
 
     // JUMP INPUT
     if (Phaser.Input.Keyboard.JustDown(keys.jump) || gemePadButton0JustPressed) {
@@ -1236,11 +1275,12 @@ this.hasDoubleJumped = false; // Tracks if the double jump has been used
         gemePadButton1JustPressed = true;
 
       }
-      this.gamepadbutton1  = buttonPressed;
+      this.gamepadbutton1 = buttonPressed;
     }
 
     // Attack: Use JustDown() for better control (Button B = index 1)
-    if ( Phaser.Input.Keyboard.JustDown(keys.attack) || gemePadButton1JustPressed ) {
+    if (Phaser.Input.Keyboard.JustDown(keys.attack) || gemePadButton1JustPressed) {
+
       this.attack = true;
       console.log("Attack input");
     }
@@ -1320,29 +1360,29 @@ this.hasDoubleJumped = false; // Tracks if the double jump has been used
             }
       */
 
-            // JUMP LOGIC (SINGLE & DOUBLE JUMP)
-            if (this.jump) {
-              if (this.player.body.blocked.down) {
-                // ✅ Normal Jump from Ground
-                this.player.setVelocityY(-340);
-                this.player.play("jump", true);
-                this.sound.play("jumpSound", {
-                  volume: 1.5
-                });
+      // JUMP LOGIC (SINGLE & DOUBLE JUMP)
+      if (this.jump) {
+        if (this.player.body.blocked.down) {
+          // ✅ Normal Jump from Ground
+          this.player.setVelocityY(-340);
+          this.player.play("jump", true);
+          this.sound.play("jumpSound", {
+            volume: 1.5
+          });
 
-                this.canDoubleJump = true; // Allow double jump
-                this.hasDoubleJumped = false; // Reset double jump flag
-              } else if (this.canDoubleJump && !this.hasDoubleJumped) {
-                // ✅ Double Jump in the Air
-                this.player.setVelocityY(-300); // Slightly less force than first jump
-                this.player.play("jump", true);
-                this.sound.play("jumpSound", {
-                  volume: 1.2
-                }); // Lower volume for second jump
+          this.canDoubleJump = true; // Allow double jump
+          this.hasDoubleJumped = false; // Reset double jump flag
+        } else if (this.canDoubleJump && !this.hasDoubleJumped) {
+          // ✅ Double Jump in the Air
+          this.player.setVelocityY(-300); // Slightly less force than first jump
+          this.player.play("jump", true);
+          this.sound.play("jumpSound", {
+            volume: 1.2
+          }); // Lower volume for second jump
 
-                this.hasDoubleJumped = true; // Mark that double jump was used
-              }
-            }
+          this.hasDoubleJumped = true; // Mark that double jump was used
+        }
+      }
 
 
       // LAND
@@ -1386,44 +1426,51 @@ this.hasDoubleJumped = false; // Tracks if the double jump has been used
 
     // Trigger Attack
     if (this.attack && this.canAttack) {
-      console.log("Attack triggered");
-      this.canAttack = false; // Prevent attacking again immediately
-      this.isAttacking = true; // Set attack flag
 
-      this.sound.play("attackSound", {
-        volume: 1.5
-      }); // Adjust volume if needed
-      this.player.setVelocityX(0); // Stop movement during attack
+      if (this.physics.overlap(this.player, this.npcs)) {
+        console.log("NPC");
+        this.displayNpcText();
+      } else {
+        console.log("Attack triggered");
+        this.canAttack = false; // Prevent attacking again immediately
+        this.isAttacking = true; // Set attack flag
 
-      // Reset attack ability after cooldown
+        this.sound.play("attackSound", {
+          volume: 1.5
+        }); // Adjust volume if needed
+        this.player.setVelocityX(0); // Stop movement during attack
 
-      this.time.delayedCall(600, () => { // Adjust the delay as needed
-        this.canAttack = true;
-      });
+        // Reset attack ability after cooldown
 
-      this.player.play("attack", true);
-      // Wait until the attack animation completes before resetting attack flag
-      this.player.once("animationcomplete", () => {
-        this.isAttacking = false; // Reset attack flag
+        this.time.delayedCall(600, () => { // Adjust the delay as needed
+          this.canAttack = true;
+        });
 
-        this.player.play("idle", true); // Go back to idle
-        console.log("Attack animation complete");
-      });
+        this.player.play("attack", true);
+        // Wait until the attack animation completes before resetting attack flag
+        this.player.once("animationcomplete", () => {
+          this.isAttacking = false; // Reset attack flag
 
-      let offsetX = this.player.flipX ? -34 : 34; // Adjust for direction
-      let hitbox = this.attackHitboxes.create(
-        this.player.x + offsetX,
-        this.player.y + 20,
-        null
-      );
+          this.player.play("idle", true); // Go back to idle
+          console.log("Attack animation complete");
+        });
 
-      hitbox.setSize(46, 40); // Set hitbox size
-      hitbox.setVisible(false); // Hide hitbox
-      hitbox.body.allowGravity = false; // No gravity
-      // Destroy hitbox after time
-      this.time.delayedCall(300, () => {
-        hitbox.destroy();
-      });
+        let offsetX = this.player.flipX ? -34 : 34; // Adjust for direction
+        let hitbox = this.attackHitboxes.create(
+          this.player.x + offsetX,
+          this.player.y + 20,
+          null
+        );
+
+        hitbox.setSize(46, 40); // Set hitbox size
+        hitbox.setVisible(false); // Hide hitbox
+        hitbox.body.allowGravity = false; // No gravity
+        // Destroy hitbox after time
+        this.time.delayedCall(300, () => {
+          hitbox.destroy();
+        });
+      }
+
     }
 
     // MOVE HITBOXES SO THEY FOLLOW PLAYER
@@ -1431,6 +1478,7 @@ this.hasDoubleJumped = false; // Tracks if the double jump has been used
       let offsetX = this.player.flipX ? -34 : 34; // Adjust for direction
       hitbox.setPosition(this.player.x + offsetX, this.player.y + 20);
     });
+
   }
 
   updateUI() {
@@ -1470,21 +1518,21 @@ this.hasDoubleJumped = false; // Tracks if the double jump has been used
 
     // Adjust speeds: farther layers (bg1) move the slowest, closer (bg12) move fastest
     backgrounds.forEach((bg, index) => {
-        const factor = 0.02 + (backgrounds.length - index) * 0.02; // Reverse order
-        bg.x = scrollX * factor;
+      const factor = 0.02 + (backgrounds.length - index) * 0.02; // Reverse order
+      bg.x = scrollX * factor;
     });
-}
+  }
 
   // ENEMIES
   // ------------------------------------------------------
   updateEnnemies() {
     // Vérifier si le joueur est mort et arrêter les ennemis
     if (this.player.isDead) {
-        this.enemies.children.iterate((enemy) => {
-            enemy.setVelocityX(0);
-            enemy.play("enemy_idle", true);
-        });
-        return; // Sortir de la fonction pour empêcher tout autre comportement
+      this.enemies.children.iterate((enemy) => {
+        enemy.setVelocityX(0);
+        enemy.play("enemy_idle", true);
+      });
+      return; // Sortir de la fonction pour empêcher tout autre comportement
     }
 
     this.enemies.children.iterate((enemy) => {
@@ -1508,7 +1556,9 @@ this.hasDoubleJumped = false; // Tracks if the double jump has been used
           enemy.setVelocityX(0);
           enemy.isAttacking = true;
           enemy.play("enemy_attack", true);
-          this.sound.play("mushroomAttack", { volume: 3 });
+          this.sound.play("mushroomAttack", {
+            volume: 3
+          });
 
           enemy.flipX = this.player.x > enemy.x;
 
@@ -1563,10 +1613,10 @@ this.hasDoubleJumped = false; // Tracks if the double jump has been used
         }
       }
     });
-}
+  }
 
   update() {
-    if(!this.player.isDead )this.updatePlayer();
+    if (!this.player.isDead) this.updatePlayer();
 
 
     this.updateEnnemies();
@@ -1642,8 +1692,8 @@ this.hasDoubleJumped = false; // Tracks if the double jump has been used
       }
     });
 
-    
-  
 
-}
+
+
+  }
 }
