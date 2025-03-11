@@ -27,6 +27,8 @@ class Jeu extends Phaser.Scene {
     this.load.image('texte_npc_1', "./images/texte_lavar_1.png");
     this.load.image('texte_npc_2', "./images/texte_lavar_2.png");
     this.load.image('texte_npc_3', "./images/texte_lavar_3.png");
+    this.load.image('texte_npc_4', "./images/texte_lavar_4.png");
+
 
     // Load Heart images
     this.load.image("hp_5", "./images/coeur_5.png");
@@ -292,10 +294,38 @@ class Jeu extends Phaser.Scene {
       });
       this.texteNpcCount = 3;
 
-    } else if (this.texteNpcCount > 2) {
+    } else if (this.texteNpcCount == 3) {
+      this.texteNpc4 = this.add.image(2240, 565, 'texte_npc_4');
+      this.texteNpc4.setScale(0.35).setAlpha(0);
       this.textNpcAnimationComplete = false;
+
       this.tweens.add({
         targets: this.texteNpc3,
+        alpha: 0, // Fully visible
+        y: this.cameras.main.centerY + 50, // Move down
+        duration: 850, // Fade-in & move-up duration (.850 sec)
+        ease: 'Linear',
+        onComplete: () => {
+          this.tweens.add({
+            targets: this.texteNpc4,
+            alpha: 1, // Fully visible
+            y: this.cameras.main.centerY - 0, // Move down
+            duration: 850, // Fade-in & move-up duration (.850 sec)
+            ease: 'Linear',
+            onComplete: () => {
+              this.textNpcAnimationComplete = true;
+            }
+          });
+        }
+      });
+
+      this.texteNpcCount = 4;
+
+    }  else if (this.texteNpcCount > 3) {
+      this.textNpcAnimationComplete = false;
+
+      this.tweens.add({
+        targets: this.texteNpc4,
         alpha: 0, // Fully visible
         y: this.cameras.main.centerY + 50, // Move down
         duration: 850, // Fade-in & move-up duration (.850 sec)
@@ -304,7 +334,6 @@ class Jeu extends Phaser.Scene {
           this.textNpcAnimationComplete = true;
         }
       });
-
       this.playerCanMove = true;
       this.texteNpcCount = 0;
     }
@@ -318,7 +347,7 @@ class Jeu extends Phaser.Scene {
     console.log("CREATING");
     // Debugging (Hidden by Default)
     this.debugGraphics = this.add.graphics().setVisible(true);
-    this.physics.world.createDebugGraphic().setVisible(true);
+    this.physics.world.createDebugGraphic().setVisible(false);
 
     // Load Tilemap
     const map = this.make.tilemap({
@@ -520,16 +549,9 @@ class Jeu extends Phaser.Scene {
     this.npc = this.physics.add.sprite(400, 300, 'npc');
     this.npc.setImmovable(true);
 
-    this.texteNpc1 = this.add.image(2240, 550, 'texte_npc_1');
-    this.texteNpc1.setScale(0.35).setAlpha(0);
 
     /*this.texteNpc1.setOrigin(2.3, 0);*/
 
-    this.texteNpc2 = this.add.image(400, 300, 'texte_npc_2');
-    this.texteNpc2.setScale(0.35).setVisible(false);
-
-    this.texteNpc3 = this.add.image(400, 300, 'texte_npc_3');
-    this.texteNpc3.setScale(0.35).setVisible(false);
 
 
     this.physics.add.overlap(this.player, this.npcs, (player, npc) => {
