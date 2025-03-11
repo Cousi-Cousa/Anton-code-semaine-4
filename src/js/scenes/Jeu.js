@@ -23,7 +23,7 @@ class Jeu extends Phaser.Scene {
 
     // Load Heart images
     this.load.image("texte_debut", "./images/texte_debut 2.png");
-    this.load.image('texte_debut_1', "./images/texte_debut 1.png");
+    this.load.image('texte_npc', "./images/texte_debut 1.png");
 
     
     // Load Heart images
@@ -287,13 +287,7 @@ skyLayer.setCollisionByProperty({ collides: false });
 
 
 
-// npc animation
-this.anims.create({
-  key: 'npc_idle',
-  frames: this.anims.generateFrameNumbers('npc', { start: 0, end: 4 }),
-  frameRate: 6,
-  repeat: -1
-});
+
     
     
     // Create Player Animations
@@ -383,21 +377,32 @@ this.anims.create({
     this.player.play("idle");
 
 
+    // Create animation
+this.anims.create({
+  key: 'npc_idle',
+  frames: this.anims.generateFrameNumbers('npc', { start: 0, end: 5 }),
+  frameRate: 6,
+  repeat: -1
+});
 
-    // Create NPCs from Tiled
+// Create NPCs from Tiled
 this.npcs = this.physics.add.group();
 const npcLayer = map.getObjectLayer('npc');
 npcLayer.objects.forEach((obj) => {
-    let npc = this.npcs.create(obj.x, obj.y, 'npc');
-    npc.setImmovable(true); // Stops it from moving when the player touches it
-npc.body.allowGravity = false; // Stops it from falling due to gravity
-npc.setVelocity(0); // Stops it from moving entirely
-    npc.setScale(1);
-    npc.setDepth(5);
-    npc.play('npc_idle', true);
+  let npc  = this.npcs.create(obj.x, obj.y, 'npc');
+  npc.setScale(1);
+  npc.setDepth(5);
+  npc.play('npc_idle', true);
 });
 
+this.npc = this.physics.add.sprite(400, 300, 'npc');
+this.npc.setImmovable(true);
 
+this.texteNpc = this.add.image(400, 300, 'texte_npc');
+this.texteNpc.setVisible(false);
+
+
+    
 
     // -------------------- 🗡️ Original Enemy (Mushroom) --------------------
 
@@ -832,22 +837,7 @@ this.enemy1Sound.setVolume(0); // Start at 0 volume to avoid abrupt noise
       console.log("🎮 Gamepad Connected:", pad.id);
     });
 
-    // -------------------- NPC MESSAGE --------------------
-    this.dialogueImage = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, 'texte_debut_1');
-    this.dialogueImage.setOrigin(1).setScale(0.35);
-    
-    this.dialogueImage.setVisible(false);
-    
-    this.physics.add.overlap(
-      this.player,
-      this.npcs, // ✅ Use the NPC group
-      () => {
-          this.showDialogue();
-      },
-      null,
-      this
-  );
-  
+
   
     
     
@@ -920,35 +910,15 @@ this.hasDoubleJumped = false; // Tracks if the double jump has been used
 
   }
 
-  showDialogue() {
-    if (this.canDismissImage) return; // Prevent triggering multiple times
-    
-    this.dialogueImage.setVisible(true);
-    this.dialogueImage.setDepth(100);
-    this.dialogueImage.setAlpha(0); // Start invisible
-    
-    // Place at the center of the CAMERA (not the world)
-    this.dialogueImage.setPosition(
-        this.cameras.main.worldView.x + this.cameras.main.width / 2,
-        this.cameras.main.worldView.y + this.cameras.main.height / 2
-    );
-
-    // Fade-in effect + move up slightly
-    this.tweens.add({
-        targets: this.dialogueImage,
-        alpha: 1, // Fully visible
-        y: this.cameras.main.worldView.y + this.cameras.main.height / 2 - 50, // Move up slightly
-        duration: 1000, // Duration of the fade-in + move up
-        ease: 'Linear'
-    });
-
-    // Prevent removal until cooldown is over
-    this.canDismissImage = false;
-
-    // Start a cooldown before allowing the player to remove the message
-    this.time.delayedCall(3000, () => {
-        this.canDismissImage = true; // Allow removal after 3 seconds
-    });
+  afficherTexteNpc() {
+    if (!this.texteNpc.visible) {
+        this.texteNpc.setVisible(true);
+      console.log('texteNPC')
+        // Optionnel : Retire l'image après quelques secondes
+        this.time.delayedCall(3000, () => {
+            this.texteNpc.setVisible(false);
+        });
+    }
 }
 
 
@@ -1383,6 +1353,37 @@ this.hasDoubleJumped = false; // Tracks if the double jump has been used
         this.player.play("jump_fall_transition", true);
       }
     }
+
+    // ✅ Contrôle de mouvement du joueur
+let playerCanMove = true;
+
+    this.physics.add.overlap(this.player, this.npcs, (player, npc) => {
+      playerCanMove = false;
+      this.player.setVelocity(0);
+      if (!this.texteNpc.visible) {
+    
+         // ✅ Affiche le texte
+        this.texteNpc.setVisible(true);
+    
+    // ❌ Désactiver le mouvement du joueur
+    playerCanMove = false;
+    this.player.setVelocity(0);
+      }
+    
+    
+      this.events.on('update', () => {
+        if (this.attack) { // If attack is triggered in your existing system
+          this.texteNpc.setVisible(false);
+        }
+    });
+    
+    // Keep gamepad support (even if it’s not working yet)
+    this.input.gamepad?.on('down', (pad, button) => {
+        if (button.index === 1) { // Button 1 (attack)
+          this.texteNpc.setVisible(false);
+        }
+      });
+    });
 
     // ATTACK
     // ------------------------------------------------------
