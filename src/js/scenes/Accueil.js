@@ -4,10 +4,10 @@ class Accueil extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('background', './images/Background.png');
+        this.load.image('background', './images/menu.jpg');
         this.load.image('logo', './images/logo2.png');
-        this.load.image('btnCommencer', './images/Start.png');
-        this.load.image('btnCommencerDark', './images/Start_Dark.png');
+        this.load.image('btnCommencer', './images/commencer.png');
+        this.load.image('btnCommencerDark', './images/commencer.png');
 
         // Sounds
         this.load.audio('clickSound', './Sounds/retro-click-236673.mp3');
@@ -82,6 +82,7 @@ class Accueil extends Phaser.Scene {
         this.cameras.main.fadeIn(1000); // 500ms fade-in effect
         
         // ----------------- 🎮 GAMEPAD SUPPORT -----------------
+
 
     // Listen for gamepad connection
     this.input.gamepad.once('connected', (pad) => {

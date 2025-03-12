@@ -416,7 +416,7 @@ class Jeu extends Phaser.Scene {
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
 
     // Create the Player
-    this.player = this.physics.add.sprite(100, 584, "player_idle");
+    this.player = this.physics.add.sprite(1000, 584, "player_idle");
     this.player
       .setBounce(0.1)
       .setCollideWorldBounds(true)
@@ -872,9 +872,9 @@ class Jeu extends Phaser.Scene {
       }
 
       // Show a message based on how many quest items have been collected
-      let message = "Un Rubis Ancien...";
+      let message = "Le rubis maudit...";
       if (this.collectedQuestItems > 0) {
-        message = `Vous avez trouvé ${this.collectedQuestItems} pièce(s) du Rubis !`;
+        message = `Vous avez trouvé ${this.collectedQuestItems} morceaux de parchemin !`;
       }
       this.rubisText.setText(message);
       this.rubisText.setPosition(this.player.x, this.player.y - 30);
@@ -1163,7 +1163,7 @@ class Jeu extends Phaser.Scene {
 
     // Show floating text for each collected item
     let pickupText = this.add
-      .text(this.player.x, this.player.y - 30, "+1 Quest Item", {
+      .text(this.player.x, this.player.y - 30, "+1 Morceau de parchemin", {
         fontFamily: "PixelFont",
         fontSize: "16px",
         fill: "#ffff00",
@@ -1187,7 +1187,7 @@ class Jeu extends Phaser.Scene {
 
   showQuestCompleteText() {
     let completionText = this.add
-      .text(this.player.x, this.player.y - 50, "All pieces collected!", {
+      .text(this.player.x, this.player.y - 50, "Vous avez tous les morceaux de parchemin", {
         fontFamily: "PixelFont",
         fontSize: "18px",
         fill: "#00ff00",
