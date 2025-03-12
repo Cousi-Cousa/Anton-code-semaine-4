@@ -208,6 +208,16 @@ class Jeu extends Phaser.Scene {
       }
     );
 
+    for(let i = 1; i <= 10; i++) {
+      this.load.audio(`jumpSound_${i}`, `sounds/saut/saut_${i}.wav`)
+      
+    }
+
+    for(let i = 1; i <= 10; i++) {
+      this.load.audio(`jumpSound_${i}`, `sounds/saut/saut_${i}.wav`)
+      
+    }
+
     // Music-Sounds
     this.load.audio("attackSound", "sounds/Attack.wav");
     this.load.audio("jumpSound", "sounds/Jump.wav");
@@ -218,8 +228,6 @@ class Jeu extends Phaser.Scene {
     this.load.audio("walkSound", "sounds/Walk.wav");
     this.load.audio("mushroomAttack", "sounds/attaque_champignon_test 5.wav");
     this.load.audio("rubisSound", "sounds/ambiance_artefact_reaper 1.wav");
-
-
 
   }
 
@@ -1115,11 +1123,8 @@ class Jeu extends Phaser.Scene {
     if (this.endingTriggered) return;
     this.endingTriggered = true;
 
-    this.victoire = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, 'victoryBanner');
-
-
-    // Fade out effect
-    this.cameras.main.fadeOut(1500, 0, 0, 0);
+        // Fade out effect
+        this.cameras.main.fadeOut(1500, 0, 0, 0);
 
     // Delay before switching to Accueil scene
     this.time.delayedCall(4000, () => {
@@ -1478,14 +1483,18 @@ class Jeu extends Phaser.Scene {
       */
 
       // JUMP LOGIC (SINGLE & DOUBLE JUMP)
+            this.jumpSoundList = [];
+
+            for(let i = 1; i <= 10; i++) {
+              this.jumpSoundList.push(this.sound.add(`jumpSound_${i}`));
+            }
+
       if (this.jump) {
         if (this.player.body.blocked.down) {
           // ✅ Normal Jump from Ground
           this.player.setVelocityY(-340);
           this.player.play("jump", true);
-          this.sound.play("jumpSound", {
-            volume: 1.5
-          });
+          this.playRandomJumpSound();
 
           this.canDoubleJump = true; // Allow double jump
           this.hasDoubleJumped = false; // Reset double jump flag
@@ -1493,14 +1502,14 @@ class Jeu extends Phaser.Scene {
           // ✅ Double Jump in the Air
           this.player.setVelocityY(-300); // Slightly less force than first jump
           this.player.play("jump", true);
-          this.sound.play("jumpSound", {
-            volume: 1.2
-          }); // Lower volume for second jump
+          //this.sound.play("jumpSound", {
+          //  volume: 1.2
+          //}); // Lower volume for second jump
+          this.playRandomJumpSound();
 
           this.hasDoubleJumped = true; // Mark that double jump was used
         }
       }
-
 
       // LAND
       // ------------------------------------------------------
@@ -1734,6 +1743,16 @@ class Jeu extends Phaser.Scene {
       }
     });
   }
+
+
+  //fonction de sauts aléatoires
+  playRandomJumpSound() {
+    //let = randomJumpIndex = Phaser.Math.Between(0, this.jumpSoundList.length - 1);
+    this.jumpSoundList[Phaser.Math.Between(0, this.jumpSoundList.length - 1)].play();
+
+    
+  }
+
 
   update() {
     if (!this.player.isDead) this.updatePlayer();
