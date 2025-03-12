@@ -351,6 +351,17 @@
                 }, 
                 {
                  "height":0,
+                 "id":290,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":5604.5,
+                 "y":375.5
+                }, 
+                {
+                 "height":0,
                  "id":291,
                  "name":"",
                  "rotation":0,
@@ -468,7 +479,7 @@
                  "visible":true,
                  "width":0,
                  "x":2240,
-                 "y":572
+                 "y":576
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -639,35 +650,35 @@
                 }, 
                 {
                  "height":0,
-                 "id":325,
+                 "id":332,
                  "name":"",
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":1900,
+                 "x":2056,
                  "y":572
                 }, 
                 {
                  "height":0,
-                 "id":326,
+                 "id":333,
                  "name":"",
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":1944,
-                 "y":568
+                 "x":2000,
+                 "y":572
                 }, 
                 {
                  "height":0,
-                 "id":327,
+                 "id":334,
                  "name":"",
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":2004,
+                 "x":1932,
                  "y":572
                 }],
          "opacity":1,
@@ -677,7 +688,7 @@
          "y":0
         }],
  "nextlayerid":24,
- "nextobjectid":328,
+ "nextobjectid":335,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
@@ -1005,19 +1016,6 @@
                          "value":true
                         }]
                 }],
-         "tilewidth":16
-        }, 
-        {
-         "columns":4,
-         "firstgid":125,
-         "image":"..\/sprites\/fruits.png",
-         "imageheight":64,
-         "imagewidth":64,
-         "margin":0,
-         "name":"fruits",
-         "spacing":0,
-         "tilecount":16,
-         "tileheight":16,
          "tilewidth":16
         }],
  "tilewidth":16,

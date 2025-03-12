@@ -82,7 +82,7 @@ class Jeu extends Phaser.Scene {
 
     // Load npc Spritesheets
     this.load.spritesheet("npc", "./sprites/npc.png", {
-      frameWidth: 29.8,
+      frameWidth: 29,
       frameHeight: 38
     });
 
@@ -207,15 +207,20 @@ class Jeu extends Phaser.Scene {
         frameHeight: 32
       }
     );
+    this.load.spritesheet(
+      "sprite_manuscrit",
+      "./sprites/manuscrit.png", {
+        frameWidth: 46.5263157895,
+        frameHeight: 32
+      }
+    );
 
     for(let i = 1; i <= 10; i++) {
       this.load.audio(`jumpSound_${i}`, `sounds/saut/saut_${i}.wav`)
-      
     }
 
     for(let i = 1; i <= 10; i++) {
-      this.load.audio(`jumpSound_${i}`, `sounds/saut/saut_${i}.wav`)
-      
+      this.load.audio(`landingSound_${i}`, `sounds/atterissage/atterissage_${i}.wav`)
     }
 
     // Music-Sounds
@@ -620,6 +625,18 @@ class Jeu extends Phaser.Scene {
       repeat: 0,
     });
 
+
+    //anim manuscrit
+    this.anims.create({
+      key: "sprite_manuscrit",
+      frames: this.anims.generateFrameNumbers("sprite_manuscrit", {
+        start: 0,
+        end: 18,
+      }),
+      frameRate: 10,
+      repeat: 0,
+    });
+
     // Load enemies from Tiled object layer
     const enemySpawn = map.getObjectLayer("enemy"); // Make sure the layer is named "enemy" in Tiled
     enemySpawn.objects.forEach((obj) => {
@@ -882,8 +899,9 @@ class Jeu extends Phaser.Scene {
 
     this.physics.add.overlap(this.player, this.rubisGroup, (player, rubis) => {
       if (this.collectedQuestItems >= 3 && this.attack) {
+
         console.log("✅ Ending triggered by gamepad!");
-        this.triggerEnding();
+       this.triggerEnding();
       }
 
       // Show a message based on how many quest items have been collected
@@ -1514,6 +1532,12 @@ class Jeu extends Phaser.Scene {
       // LAND
       // ------------------------------------------------------
 
+      this.landingSoundList = [];
+
+      for (let i = 1; i <= 10; i++) {
+        this.landingSoundList.push(this.sound.add(`atterissage_${i}`))
+      }
+
       // Track if the player was in the air before landing
       if (!this.player.body.blocked.down && this.player.body.velocity.y > 200) {
         this.wasInAir = true; // Mark that the player is falling
@@ -1523,9 +1547,7 @@ class Jeu extends Phaser.Scene {
       if (this.wasInAir && this.player.body.blocked.down) {
         if (!this.landedRecently) {
           // Prevent multiple triggers
-          this.sound.play("landingSound", {
-            volume: 1.5
-          });
+          this.playRandomLandingSound();
           this.landedRecently = true;
 
           // Reset the flag after a short delay
@@ -1619,6 +1641,7 @@ class Jeu extends Phaser.Scene {
       this.questText.setPosition(this.player.x, this.player.y - 30);
     }
   }
+
 
   updateCamera() {
     // CAMERA
@@ -1751,6 +1774,10 @@ class Jeu extends Phaser.Scene {
     this.jumpSoundList[Phaser.Math.Between(0, this.jumpSoundList.length - 1)].play();
 
     
+  }
+
+  playRandomLandingSound(){
+    this.landingSoundList[Phaser.Math.Between(0, this.landingSoundList.length - 1)].play();
   }
 
 
