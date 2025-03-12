@@ -38,6 +38,12 @@ class Jeu extends Phaser.Scene {
     this.load.image("hp_1", "./images/coeur_1.png");
     this.load.image("hp_0", "./images/coeur_0.png");
 
+    // Load pieces of map
+    this.load.image("piece_0", "./images/manuscrit_0.png");
+    this.load.image("piece_1", "./images/manuscrit_1.png");
+    this.load.image("piece_2", "./images/manuscrit_2.png");
+    this.load.image("piece_3", "./images/manuscrit_3.png");
+
     // Load Tilemap and Tilesets
     this.load.tilemapTiledJSON("map", "./maps/test1.json");
     this.load.image("Tileset", "./sprites/Tileset.png");
@@ -53,7 +59,7 @@ class Jeu extends Phaser.Scene {
       frameHeight: 16,
     });
     // Load potion Spritesheet
-    this.load.spritesheet("potionsheet", "./sprites/potion.png", {
+    this.load.spritesheet("potionsheet", "./sprites/fruits.png", {
       frameWidth: 16,
       frameHeight: 16,
     });
@@ -214,7 +220,6 @@ class Jeu extends Phaser.Scene {
   }
 
   displayNpcText() {
-
     this.texteNpcShown = true;
 
     console.log("Display NPC text " + this.texteNpcCount);
@@ -425,10 +430,6 @@ class Jeu extends Phaser.Scene {
       .setOffset(40, 40);
     this.physics.add.collider(this.player, platformsLayer);
     this.physics.add.collider(this.player, landLayer);
-
-
-
-
 
 
     // Create Player Animations
@@ -812,7 +813,9 @@ class Jeu extends Phaser.Scene {
 
         console.log(`Quest Items Collected: ${this.inventory.questItems}`);
       }
+      
     });
+
 
     // ---------------- RUBIS ----------------
 

@@ -351,17 +351,6 @@
                 }, 
                 {
                  "height":0,
-                 "id":290,
-                 "name":"",
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":5604.5,
-                 "y":375.5
-                }, 
-                {
-                 "height":0,
                  "id":291,
                  "name":"",
                  "rotation":0,
@@ -647,6 +636,39 @@
                  "width":0,
                  "x":4717.75,
                  "y":648
+                }, 
+                {
+                 "height":0,
+                 "id":325,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1900,
+                 "y":572
+                }, 
+                {
+                 "height":0,
+                 "id":326,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1944,
+                 "y":568
+                }, 
+                {
+                 "height":0,
+                 "id":327,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":2004,
+                 "y":572
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -655,7 +677,7 @@
          "y":0
         }],
  "nextlayerid":24,
- "nextobjectid":324,
+ "nextobjectid":328,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
@@ -983,6 +1005,19 @@
                          "value":true
                         }]
                 }],
+         "tilewidth":16
+        }, 
+        {
+         "columns":4,
+         "firstgid":125,
+         "image":"..\/sprites\/fruits.png",
+         "imageheight":64,
+         "imagewidth":64,
+         "margin":0,
+         "name":"fruits",
+         "spacing":0,
+         "tilecount":16,
+         "tileheight":16,
          "tilewidth":16
         }],
  "tilewidth":16,

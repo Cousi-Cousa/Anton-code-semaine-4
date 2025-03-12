@@ -7,7 +7,6 @@ class Accueil extends Phaser.Scene {
         this.load.image('background', './images/menu.jpg');
         this.load.image('logo', './images/logo2.png');
         this.load.image('btnCommencer', './images/commencer.png');
-        this.load.image('btnCommencerDark', './images/commencer.png');
 
         // Sounds
         this.load.audio('clickSound', './Sounds/retro-click-236673.mp3');
@@ -31,7 +30,7 @@ class Accueil extends Phaser.Scene {
         this.registry.set('menuMusic', this.menuMusic);
 
         // Create the logo
-        const logo = this.add.image(955, 300, 'logo').setScale(0.1);
+        const logo = this.add.image(955, 270, 'logo').setScale(0.13);
 
         // Shine effect on the logo
         const shineEffect = logo.postFX.addShine(1, 0.2, 5);
@@ -47,7 +46,7 @@ class Accueil extends Phaser.Scene {
         // Animation on the logo
         this.tweens.add({
             targets: logo,
-            y: 320,
+            y: 290,
             duration: 1500,
             yoyo: true,
             repeat: -1,
@@ -55,13 +54,13 @@ class Accueil extends Phaser.Scene {
         });
 
         // Play button with hover effect
-        const commencerBtn = this.add.image(955, 550, 'btnCommencer').setInteractive().setScale(1.3);
-        commencerBtn.on('pointerover', () => commencerBtn.setTexture('btnCommencerDark'));
+        const commencerBtn = this.add.image(955, 590, 'btnCommencer').setInteractive().setScale(1.1);
+        commencerBtn.on('pointerover', () => commencerBtn.setTexture('btnCommencer'));
         commencerBtn.on('pointerout', () => commencerBtn.setTexture('btnCommencer'));
         commencerBtn.on('pointerdown', () => this.scene.start('Jeu')); // Go to the new intermediate scene first
         this.tweens.add({
             targets: commencerBtn,
-            y: 560,
+            y: 580,
             duration: 1500,
             yoyo: true,
             repeat: -1,
