@@ -44,6 +44,10 @@ class Jeu extends Phaser.Scene {
     this.load.image("piece_2", "./images/manuscrit_2.png");
     this.load.image("piece_3", "./images/manuscrit_3.png");
 
+    
+    this.load.image("victoryBanner", "./images/victoire.png");
+    this.load.image("deathBanner", "./images/mort.png");
+
     // Load Tilemap and Tilesets
     this.load.tilemapTiledJSON("map", "./maps/test1.json");
     this.load.image("Tileset", "./sprites/Tileset.png");
@@ -1111,11 +1115,14 @@ class Jeu extends Phaser.Scene {
     if (this.endingTriggered) return;
     this.endingTriggered = true;
 
+    this.victoire = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, 'victoryBanner');
+
+
     // Fade out effect
     this.cameras.main.fadeOut(1500, 0, 0, 0);
 
     // Delay before switching to Accueil scene
-    this.time.delayedCall(1800, () => {
+    this.time.delayedCall(4000, () => {
       this.scene.start("Accueil");
       this.endingTriggered = false; // ✅ Reset flag when changing scene
     });
