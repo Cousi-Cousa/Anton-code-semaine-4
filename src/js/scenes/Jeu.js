@@ -1494,7 +1494,7 @@ class Jeu extends Phaser.Scene {
 
       // Ensure a walk sound variable exists
       if (!this.walkSound) {
-        playRandomWalkingSound();
+        this.walkSound = this.sound.add('walkSound');
         
       }
 
@@ -1507,8 +1507,9 @@ class Jeu extends Phaser.Scene {
 
         if (this.player.body.blocked.down) {
           this.player.play("run", true);
+
           if (!this.walkSound.isPlaying) {
-            this.walkSound.play();
+            this.playRandomWalkingSound(); 
           }
         }
       } else {
@@ -1825,6 +1826,7 @@ class Jeu extends Phaser.Scene {
   }
 
   playRandomWalkingSound(){
+    
     this.walkingSoundList[Phaser.Math.Between(0, this.walkingSoundList.length - 1)].play();
   }
 
