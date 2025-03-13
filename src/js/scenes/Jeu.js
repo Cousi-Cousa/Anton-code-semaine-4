@@ -231,6 +231,14 @@ class Jeu extends Phaser.Scene {
       this.load.audio(`walkingSound_${i}`, `sounds/marche/marche_${i}.wav`)
     }
 
+    for(let i = 1; i <= 10; i++) {
+      this.load.audio(`healthLost_${i}`, `sounds/vie_perdu/vie_perdu_${i}.wav`)
+    }
+
+    for(let i = 1; i <= 10; i++) {
+      this.load.audio(`healthUp_${i}`, `sounds/vie_perdu/vie_gagnee_${i}.wav`)
+    }
+
     // Music-Sounds
     this.load.audio("attackSound", "sounds/Attack.wav");
     this.load.audio("jumpSound", "sounds/Jump.wav");
@@ -1140,7 +1148,20 @@ class Jeu extends Phaser.Scene {
     for (let i = 1; i <= 10; i++) {
       this.walkingSoundList.push(this.sound.add(`walkingSound_${i}`))
     }
+
+    this.healthLostSoundList = [];
+
+    for (let i = 1; i <= 10; i++) {
+      this.healthLostSoundList.push(this.sound.add(`healthLost_${i}`))
+    }
+
+    this.healthUpSoundList = [];
+
+    for (let i = 1; i <= 10; i++) {
+      this.healthUpSoundList.push(this.sound.add(`healthUp_${i}`))
+    }
   }
+  
 
   afficherTexteNpc() {
     if (!this.texteNpc.visible) {
@@ -1202,9 +1223,8 @@ class Jeu extends Phaser.Scene {
       // Restore HP one by one, but not beyond max HP (5)
       player.hp++;
       this.updateHealthBar();
-      this.sound.play("potionSound", {
-        volume: 1.2
-      }); // Play potion pickup sound
+      this.playRandomhealthUpSound();
+      // Play potion pickup sound
     }
   }
 
@@ -1283,9 +1303,7 @@ class Jeu extends Phaser.Scene {
       console.log(`Player HP: ${player.hp}`);
 
       // ✅ Play damage sound effect
-      this.sound.play("damageSound", {
-        volume: 1.5
-      });
+      this.playRandomhealthLostSound()
 
       // ✅ Stop all animations and enforce the hit sprite
       player.play("player_hit", true);
@@ -1500,27 +1518,27 @@ class Jeu extends Phaser.Scene {
 
       // Handle movement (Allowing movement both on the ground and in the air)
       if (moveLeft || moveRight) {
-        let speed = this.player.body.blocked.down ? 120 : 80; // Slower movement in the air
+        let speed = this.player.body.blocked.down ? 120 : 80;
         this.player.setVelocityX(moveLeft ? -speed : speed);
         this.player.flipX = moveLeft;
         this.lastDirection = moveLeft ? "left" : "right";
-
+    
         if (this.player.body.blocked.down) {
-          this.player.play("run", true);
-
-          if (!this.walkSound.isPlaying) {
-            this.playRandomWalkingSound(); 
-          }
+            this.player.play("run", true);
+    
+            if (!this.walkSound || !this.walkSound.isPlaying) {
+                this.playRandomWalkingSound(); 
+            }
         }
-      } else {
+    } else {
         if (this.player.body.blocked.down) {
-          this.player.setVelocityX(0);
-          this.player.play("idle", true);
-          if (this.walkSound.isPlaying) {
-            this.walkSound.stop();
-          }
+            this.player.setVelocityX(0);
+            this.player.play("idle", true);
+            if (this.walkSound && this.walkSound.isPlaying) {
+                this.walkSound.stop();
+            }
         }
-      }
+    }
       // Keep hitbox aligned when idle
       this.player.body.setOffset(this.lastDirection === "left" ? 54 : 44, 40);
 
@@ -1826,9 +1844,24 @@ class Jeu extends Phaser.Scene {
   }
 
   playRandomWalkingSound(){
-    
-    this.walkingSoundList[Phaser.Math.Between(0, this.walkingSoundList.length - 1)].play();
+    if (this.walkSound && this.walkSound.isPlaying) {
+        this.walkSound.stop(); // Stop the previous sound if it's playing
+    }
+
+    // ✅ Stocke l'instance dans `this.walkSound` au lieu du résultat de `play()`
+    this.walkSound = this.walkingSoundList[Phaser.Math.Between(0, this.walkingSoundList.length - 1)];
+    this.walkSound.play(); // ✅ Joue le son séparément
   }
+
+  playRandomhealthLostSound() {
+    this.healthLostSoundList[Phaser.Math.Between(0, this.healthLostSoundList.length - 1)].play();
+  }
+
+  playRandomhealthUpSound() {
+    this.healthUpSoundList[Phaser.Math.Between(0, this.healthUpSoundList.length - 1)].play();
+  }
+
+
 
 
   update() {
