@@ -251,6 +251,14 @@ class Jeu extends Phaser.Scene {
       this.load.audio(`impactMush_${i}`, `sounds/impact_champignon/impact_champignon_${i}.wav`)
     }
 
+    for(let i = 1; i <= 10; i++) {
+      this.load.audio(`parchemin_${i}`, `sounds/interaction_parchemin/interaction_parchemin_${i}.wav`)
+    }
+
+    for(let i = 1; i <= 10; i++) {
+      this.load.audio(`slime_${i}`, `sounds/deplacement_slime/deplacement_slime_${i}.wav`)
+    }
+
 
     // Music-Sounds
     this.load.audio("attackSound", "sounds/Attack.wav");
@@ -275,7 +283,7 @@ class Jeu extends Phaser.Scene {
 
       this.playerCanMove = false;
       this.texteNpc1 = this.add.image(2240, 565, 'texte_npc_1');
-      this.texteNpc1.setScale(0.35).setAlpha(0);
+      this.texteNpc1.setScale(0.35).setAlpha(0).setDepth(5);
       // ✅ Affiche le texte
       this.textNpcAnimationComplete = false;
 
@@ -293,7 +301,7 @@ class Jeu extends Phaser.Scene {
       
     } else if (this.texteNpcCount == 1) {
       this.texteNpc2 = this.add.image(2240, 565, 'texte_npc_2');
-      this.texteNpc2.setScale(0.35).setAlpha(0);
+      this.texteNpc2.setScale(0.35).setAlpha(0).setDepth(5);
 
       this.textNpcAnimationComplete = false;
 
@@ -321,7 +329,7 @@ class Jeu extends Phaser.Scene {
 
     } else if (this.texteNpcCount == 2) {
       this.texteNpc3 = this.add.image(2240, 565, 'texte_npc_3');
-      this.texteNpc3.setScale(0.35).setAlpha(0);
+      this.texteNpc3.setScale(0.35).setAlpha(0).setDepth(5);
       this.textNpcAnimationComplete = false;
 
       this.tweens.add({
@@ -347,7 +355,7 @@ class Jeu extends Phaser.Scene {
 
     } else if (this.texteNpcCount == 3) {
       this.texteNpc4 = this.add.image(2240, 565, 'texte_npc_4');
-      this.texteNpc4.setScale(0.35).setAlpha(0);
+      this.texteNpc4.setScale(0.35).setAlpha(0).setDepth(5);
       this.textNpcAnimationComplete = false;
 
       this.tweens.add({
@@ -398,7 +406,7 @@ class Jeu extends Phaser.Scene {
     console.log("CREATING");
     // Debugging (Hidden by Default)
     this.debugGraphics = this.add.graphics().setVisible(true);
-    this.physics.world.createDebugGraphic().setVisible(false);
+    this.physics.world.createDebugGraphic().setVisible(true);
 
     // Load Tilemap
     const map = this.make.tilemap({
@@ -430,7 +438,7 @@ class Jeu extends Phaser.Scene {
     skyLayer.setDepth(0); // Sky at the back
     landLayer.setDepth(0); // Land behind platforms and structure
     platformsLayer.setDepth(0); // Platforms in front of land
-    decorationLayer.setDepth(1); // Structure/decoration at the front
+    decorationLayer.setDepth(0); // Structure/decoration at the front
 
 
     // ✅ Désactiver la collision pour la décoration
@@ -468,13 +476,14 @@ class Jeu extends Phaser.Scene {
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
 
     // Create the Player
-    this.player = this.physics.add.sprite(1000, 584, "player_idle");
+    this.player = this.physics.add.sprite(2000, 284, "player_idle");
     this.player
       .setBounce(0.1)
       .setCollideWorldBounds(true)
       .setGravityY(800)
       .setSize(20, 40)
-      .setOffset(40, 40);
+      .setOffset(40, 40)
+      .setDepth(2);
     this.physics.add.collider(this.player, platformsLayer);
     this.physics.add.collider(this.player, landLayer);
 
@@ -591,6 +600,7 @@ class Jeu extends Phaser.Scene {
       let npc = this.npcs.create(obj.x, obj.y, 'npc');
       npc.setScale(1);
       npc.setDepth(0);
+      npc.setSize(100, 80);
       npc.play('npc_idle', true);
     });
 
@@ -907,6 +917,7 @@ class Jeu extends Phaser.Scene {
         color: "#ffffff",
         stroke: "#000000",
         strokeThickness: 3,
+        
       }
     );
     this.rubisText.setOrigin(0.5, 1);
@@ -950,8 +961,8 @@ class Jeu extends Phaser.Scene {
     });
 
     // Create background layers with lower depth (behind everything)
-    this.bg1 = this.add.image(0, 0, "bg1").setOrigin(0, 0).setDepth(-10);
-    this.bg2 = this.add.image(0, 0, "bg2").setOrigin(0, 0).setDepth(-9);
+    this.bg1 = this.add.image(0, 0, "bg1").setOrigin(0, 0).setDepth(-9);
+    this.bg2 = this.add.image(0, 0, "bg2").setOrigin(0, 0).setDepth(-10);
     this.bg3 = this.add.image(0, 0, "bg3").setOrigin(0, 0).setDepth(-8);
     this.bg4 = this.add.image(0, 0, "bg4").setOrigin(0, 0).setDepth(-7);
     this.bg5 = this.add.image(0, 0, "bg5").setOrigin(0, 0).setDepth(-6);
@@ -1191,6 +1202,18 @@ class Jeu extends Phaser.Scene {
     for (let i = 1; i <= 10; i++) {
       this.impactMushSoundList.push(this.sound.add(`impactMush_${i}`))
     }
+
+    this.parcheminSoundList = [];
+
+    for (let i = 1; i <= 10; i++) {
+      this.parcheminSoundList.push(this.sound.add(`parchemin_${i}`))
+    }
+
+    this.slimeSoundList = [];
+
+    for (let i = 1; i <= 10; i++) {
+      this.slimeSoundList.push(this.sound.add(`slime_${i}`))
+    }
   }
   
 
@@ -1280,9 +1303,7 @@ class Jeu extends Phaser.Scene {
 
   collectQuestItem(player, item) {
     // ✅ Play quest pickup sound effect
-    this.sound.play("questSound", {
-      volume: 1.5
-    });
+    this.playRandomParcheminSound();
 
     item.destroy(); // Remove the item
     this.collectedQuestItems++; // Increment collected count
@@ -1293,7 +1314,7 @@ class Jeu extends Phaser.Scene {
       .text(this.player.x, this.player.y - 30, "+1 Morceau de parchemin", {
         fontFamily: "PixelFont",
         fontSize: "16px",
-        fill: "#ffff00",
+        fill: "#ffffff",
         stroke: "#000000",
         strokeThickness: 2,
       })
@@ -1317,7 +1338,7 @@ class Jeu extends Phaser.Scene {
       .text(this.player.x, this.player.y - 50, "Vous avez tous les morceaux de parchemin", {
         fontFamily: "PixelFont",
         fontSize: "18px",
-        fill: "#00ff00",
+        fill: "#ffffff",
         stroke: "#000000",
         strokeThickness: 3,
       })
@@ -1730,7 +1751,7 @@ class Jeu extends Phaser.Scene {
 
   updateUI() {
     // Update UI
-    this.hpBar.setPosition(860, 380);
+    this.hpBar.setPosition(890, 380);
     //console.log(this.player.x, this.player.y - 40);
 
     if (this.questTextFollow) {
@@ -1908,6 +1929,28 @@ class Jeu extends Phaser.Scene {
     this.impactMushSoundList[Phaser.Math.Between(0, this.impactMushSoundList.length - 1)].play();
   }
 
+  playRandomParcheminSound() {
+    this.parcheminSoundList[Phaser.Math.Between(0, this.parcheminSoundList.length - 1)].play();
+  }
+
+  playRandomSlimeSound(slime) {
+    // Si le slime a déjà un son en cours, on n'en joue pas un autre
+    if (slime.currentSound && slime.currentSound.isPlaying) {
+        return;
+    }
+
+    // Sélectionne un son aléatoire dans la liste
+    slime.currentSound = this.slimeSoundList[Phaser.Math.Between(0, this.slimeSoundList.length - 1)];
+
+    // Joue le son
+    slime.currentSound.play();
+
+    // 🔥 Quand le son est terminé, appelle cette fonction pour enchaîner
+    slime.currentSound.once('complete', () => {
+        this.playRandomSlimeSound(slime); // Lance automatiquement le prochain son
+    });
+}
+
 
 
 
@@ -1960,33 +2003,36 @@ class Jeu extends Phaser.Scene {
     // === 🎵 SLIME SOUND LOGIC (FADE IN/OUT BASED ON DISTANCE) ===
     this.slimes.children.iterate((slime) => {
       if (!slime) return;
-
+  
       let distance = Phaser.Math.Distance.Between(
-        this.player.x, this.player.y,
-        slime.x, slime.y
+          this.player.x, this.player.y,
+          slime.x, slime.y
       );
-
+  
       let maxDistance = 300; // Max hearing range
       let minDistance = 50; // Full volume range
-
-      // Calculate volume based on distance
+  
+      // Calcule le volume en fonction de la distance
       let volume = Phaser.Math.Clamp(1 - (distance - minDistance) / (maxDistance - minDistance), 0, 1);
-
-      // Initialize sound instance per slime
-      if (!slime.soundInstance) {
-        slime.soundInstance = this.sound.add("jumpSound", {
-          loop: true
-        });
-        slime.soundInstance.play();
-        slime.soundInstance.setVolume(0); // Start at 0 volume
-      }
-
+  
       if (volume > 0) {
-        slime.soundInstance.setVolume(volume);
+          // ✅ Lance le son uniquement s'il n'y en a pas déjà un en train de jouer
+          if (!slime.currentSound || !slime.currentSound.isPlaying) {
+              this.playRandomSlimeSound(slime);
+          }
+          
+          // Ajuste le volume en fonction de la distance
+          if (slime.currentSound) {
+              slime.currentSound.setVolume(volume);
+          }
       } else {
-        slime.soundInstance.setVolume(0);
+          // ✅ Si le slime est trop loin, arrête le son en cours
+          if (slime.currentSound && slime.currentSound.isPlaying) {
+              slime.currentSound.stop();
+              slime.currentSound = null;
+          }
       }
-    });
+  });
 
 
 
