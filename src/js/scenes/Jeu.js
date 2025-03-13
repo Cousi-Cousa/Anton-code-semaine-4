@@ -408,10 +408,25 @@ class Jeu extends Phaser.Scene {
 
     this.registry.set('gameMusic', this.gameMusic);
 
+    // Check if menu music is playing, pause it if so
+    if (backgroundMusic && backgroundMusic.isPlaying) {
+      backgroundMusic.pause();
+    }
+
+    // Play g0me-specific music only if not already playing
     if (!gameMusic) {
-      gameMusic = this.sound.add("gameMusic", { volume: 0.05, loop: true });
+      gameMusic = this.sound.add("gameMusic", { volume: 0.03, loop: true });
       gameMusic.play();
     }
+
+    // Stop `gameMusic` when leaving the scene
+    this.events.on("shutdown", () => {
+      if (gameMusic && gameMusic.isPlaying) {
+        gameMusic.stop();
+        gameMusic = null; // Reset to allow replaying if the scene restarts
+      }
+    });
+
     console.log("CREATING");
     // Debugging (Hidden by Default)
     this.debugGraphics = this.add.graphics().setVisible(true);
