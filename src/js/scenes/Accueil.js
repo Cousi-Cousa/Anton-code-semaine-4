@@ -112,6 +112,7 @@ class Accueil extends Phaser.Scene {
         this.cameras.main.fadeOut(1000);
         this.time.delayedCall(1000, () => {
             this.scene.start("Jeu");
+            this.backgroundMusic.stop();
         });
             
         }
