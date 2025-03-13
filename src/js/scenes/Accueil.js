@@ -78,12 +78,14 @@ class Accueil extends Phaser.Scene {
         this.addClickSound(commencerBtn);
 
         // Play background music
-        if (!menuMusic) {
-            menuMusic = this.sound.add('menuMusic', { volume: 0.1, loop: true });
-            menuMusic.stop();
-        } else if (menuMusic.isPaused) {
-            menuMusic.resume();
+        if (!backgroundMusic) {
+            backgroundMusic = this.sound.add('menuMusic', { volume: 0.02, loop: true });
+            backgroundMusic.play();
+        } else if (backgroundMusic.isPaused) {
+            backgroundMusic.resume();
         }
+
+        
 
         this.cameras.main.fadeIn(1000); // 500ms fade-in effect
         

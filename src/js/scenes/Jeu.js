@@ -259,6 +259,9 @@ class Jeu extends Phaser.Scene {
       this.load.audio(`slime_${i}`, `sounds/deplacement_slime/deplacement_slime_${i}.wav`)
     }
 
+    // Music
+    this.load.audio('gameMusic', './Sounds/musique_gameplay.wav');
+
 
     // Music-Sounds
     this.load.audio("attackSound", "sounds/Attack.wav");
@@ -403,6 +406,12 @@ class Jeu extends Phaser.Scene {
 
   create() {
 
+    this.registry.set('gameMusic', this.gameMusic);
+
+    if (!gameMusic) {
+      gameMusic = this.sound.add("gameMusic", { volume: 0.05, loop: true });
+      gameMusic.play();
+    }
     console.log("CREATING");
     // Debugging (Hidden by Default)
     this.debugGraphics = this.add.graphics().setVisible(true);
