@@ -236,8 +236,21 @@ class Jeu extends Phaser.Scene {
     }
 
     for(let i = 1; i <= 10; i++) {
-      this.load.audio(`healthUp_${i}`, `sounds/vie_perdu/vie_gagnee_${i}.wav`)
+      this.load.audio(`healthUp_${i}`, `sounds/vie_gagnee/vie_gagnee_${i}.wav`)
     }
+
+    for(let i = 1; i <= 10; i++) {
+      this.load.audio(`woundedMushroom_${i}`, `sounds/blessure_ennemi/blessure_ennemi_${i}.wav`)
+    }
+
+    for(let i = 1; i <= 10; i++) {
+      this.load.audio(`dyingMushroom_${i}`, `sounds/mort_champignon/mort_champignon_${i}.wav`)
+    }
+
+    for(let i = 1; i <= 10; i++) {
+      this.load.audio(`impactMush_${i}`, `sounds/impact_champignon/impact_champignon_${i}.wav`)
+    }
+
 
     // Music-Sounds
     this.load.audio("attackSound", "sounds/Attack.wav");
@@ -1160,6 +1173,24 @@ class Jeu extends Phaser.Scene {
     for (let i = 1; i <= 10; i++) {
       this.healthUpSoundList.push(this.sound.add(`healthUp_${i}`))
     }
+
+    this.woundedMushroomSoundList = [];
+
+    for (let i = 1; i <= 10; i++) {
+      this.woundedMushroomSoundList.push(this.sound.add(`woundedMushroom_${i}`))
+    }
+
+    this.dyingMushroomSoundList = [];
+
+    for (let i = 1; i <= 10; i++) {
+      this.dyingMushroomSoundList.push(this.sound.add(`dyingMushroom_${i}`))
+    }
+
+    this.impactMushSoundList = [];
+
+    for (let i = 1; i <= 10; i++) {
+      this.impactMushSoundList.push(this.sound.add(`impactMush_${i}`))
+    }
   }
   
 
@@ -1383,13 +1414,16 @@ class Jeu extends Phaser.Scene {
     if (!enemy.isHit) {
       enemy.hp--; // Reduce enemy HP
       enemy.isHit = true; // Prevent rapid damage
+      this.playRandomWoundedMushroomSound();
 
       console.log(`Enemy HP: ${enemy.hp}`);
 
       // ✅ If the enemy is already dead, do nothing
       if (enemy.hp <= 0 && !enemy.isDead) {
         enemy.isDead = true;
-
+        this.playRandomDyingMushroomSound();
+        this.playRandomImpactMushSound() 
+        
         console.log("Enemy dies");
 
         // BUG
@@ -1402,6 +1436,7 @@ class Jeu extends Phaser.Scene {
         enemy.body.setEnable(false);
 
         enemy.play("enemy_death", true); // Forces death animation
+        this.play
         // ⏳ **Wait until animation is complete, then remove enemy**
         enemy.once("animationcomplete", () => {
           console.log("Enemy death animation done");
@@ -1859,6 +1894,18 @@ class Jeu extends Phaser.Scene {
 
   playRandomhealthUpSound() {
     this.healthUpSoundList[Phaser.Math.Between(0, this.healthUpSoundList.length - 1)].play();
+  }
+
+  playRandomWoundedMushroomSound() {
+    this.woundedMushroomSoundList[Phaser.Math.Between(0, this.woundedMushroomSoundList.length - 1)].play();
+  }
+
+  playRandomDyingMushroomSound() {
+    this.dyingMushroomSoundList[Phaser.Math.Between(0, this.dyingMushroomSoundList.length - 1)].play();
+  }
+
+  playRandomImpactMushSound() {
+    this.impactMushSoundList[Phaser.Math.Between(0, this.impactMushSoundList.length - 1)].play();
   }
 
 
