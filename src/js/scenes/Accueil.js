@@ -1,3 +1,5 @@
+let menuMusic;
+
 class Accueil extends Phaser.Scene {
     constructor() {
         super({ key: 'Accueil' });
@@ -9,10 +11,10 @@ class Accueil extends Phaser.Scene {
         this.load.image('btnCommencer', './images/commencer.png');
 
         // Sounds
-        this.load.audio('clickSound', './Sounds/retro-click-236673.mp3');
+        this.load.audio('clickSound', './Sounds/interaction_menu/interaction.wav');
 
         // Music
-        this.load.audio('menuMusic', './Sounds/01 - Welcome To The Wild West.mp3');
+        this.load.audio('menuMusic', './Sounds/musique_menu.wav');
     }
 
     // Click sound to any button
@@ -23,11 +25,16 @@ class Accueil extends Phaser.Scene {
     }
 
     create() {
+
+        this.clickSound = this.sound.add('clickSound');
+        
         // Background and logo
         this.add.image(955, 537.5, 'background').setScale(1);
         
         // Store the music instance globally
         this.registry.set('menuMusic', this.menuMusic);
+
+        
 
         // Create the logo
         const logo = this.add.image(955, 270, 'logo').setScale(0.13);
@@ -71,11 +78,11 @@ class Accueil extends Phaser.Scene {
         this.addClickSound(commencerBtn);
 
         // Play background music
-        if (!backgroundMusic) {
-            backgroundMusic = this.sound.add('menuMusic', { volume: 0.0, loop: true });
-            backgroundMusic.play();
-        } else if (backgroundMusic.isPaused) {
-            backgroundMusic.resume();
+        if (!menuMusic) {
+            menuMusic = this.sound.add('menuMusic', { volume: 0.1, loop: true });
+            menuMusic.stop();
+        } else if (menuMusic.isPaused) {
+            menuMusic.resume();
         }
 
         this.cameras.main.fadeIn(1000); // 500ms fade-in effect
@@ -93,8 +100,11 @@ class Accueil extends Phaser.Scene {
     // Check gamepad input in update loop
     this.input.gamepad.on('down', (pad, button) => {
         if (button.index === 1) { // Button 1 (B on Xbox / Circle on PS)
-            console.log("✅ Gamepad button 1 pressed - Starting game!");
-            this.sound.play('clickSound'); // Play click sound
+            console.log("✅ Gamepad button 1 pressed - Starting game!")
+            this.clickSound.play({
+                volume: 0.2,
+                loop: false
+            });
 
         // Fade out and change scene after delay
         this.cameras.main.fadeOut(1000);

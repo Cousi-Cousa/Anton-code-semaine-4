@@ -7,7 +7,7 @@ const config = {
   input: { gamepad: true }, // Enable gamepad support
   
   parent: 'gameContainer',
-  scene: [Accueil, Jeu, CommentJouer, Controles, Credit, PartieTerminee, Victoire, HighScoresScene],
+  scene: [Accueil, Jeu, CommentJouer, Mort, Credit, PartieTerminee, Victoire, HighScoresScene],
   audio: {
     disableWebAudio: false
   },

@@ -223,6 +223,14 @@ class Jeu extends Phaser.Scene {
       this.load.audio(`landingSound_${i}`, `sounds/atterissage/atterissage_${i}.wav`)
     }
 
+    for(let i = 1; i <= 11; i++) {
+      this.load.audio(`swordSound_${i}`, `sounds/swoosh_epee/swoosh_epee_${i}.wav`)
+    }
+
+    for(let i = 1; i <= 10; i++) {
+      this.load.audio(`walkingSound_${i}`, `sounds/marche/marche_${i}.wav`)
+    }
+
     // Music-Sounds
     this.load.audio("attackSound", "sounds/Attack.wav");
     this.load.audio("jumpSound", "sounds/Jump.wav");
@@ -392,6 +400,7 @@ class Jeu extends Phaser.Scene {
     const platformsLayer = map.createLayer("platforms", platformTiles, 0, 0);
     const decorationLayer = map.createLayer("structure", decorationTiles, 0, 0);
 
+
     if (!decorationLayer) {
       console.error("❌ Decoration layer failed to load.");
     }
@@ -400,11 +409,11 @@ class Jeu extends Phaser.Scene {
     skyLayer.setDepth(0); // Sky at the back
     landLayer.setDepth(0); // Land behind platforms and structure
     platformsLayer.setDepth(0); // Platforms in front of land
-    decorationLayer.setDepth(0); // Structure/decoration at the front
+    decorationLayer.setDepth(1); // Structure/decoration at the front
 
 
     // ✅ Désactiver la collision pour la décoration
-    decorationLayer.setDepth(-1); // Mettre en arrière-plan
+    //decorationLayer.setDepth(-1); // Mettre en arrière-plan
     decorationLayer.setCollisionByProperty({
       collides: false
     });
@@ -1102,8 +1111,35 @@ class Jeu extends Phaser.Scene {
     this.gamepadbutton0 = false;
 
     this.endingTriggered = false;
+    
+    this.createSoundLists();
 
+  }
 
+  createSoundLists() {
+    this.jumpSoundList = [];
+
+    for(let i = 1; i <= 10; i++) {
+      this.jumpSoundList.push(this.sound.add(`jumpSound_${i}`));
+    }
+
+    this.landingSoundList = [];
+
+    for (let i = 1; i <= 10; i++) {
+      this.landingSoundList.push(this.sound.add(`landingSound_${i}`))
+    }
+
+    this.swordSoundList = [];
+
+    for (let i = 1; i <= 11; i++) {
+      this.swordSoundList.push(this.sound.add(`swordSound_${i}`))
+    }
+
+    this.walkingSoundList = [];
+
+    for (let i = 1; i <= 10; i++) {
+      this.walkingSoundList.push(this.sound.add(`walkingSound_${i}`))
+    }
   }
 
   afficherTexteNpc() {
@@ -1140,13 +1176,20 @@ class Jeu extends Phaser.Scene {
 
     if (this.endingTriggered) return;
     this.endingTriggered = true;
+    this.playerCanMove = false;
 
         // Fade out effect
         this.cameras.main.fadeOut(1500, 0, 0, 0);
 
+        this.rubisSound.stop();
+
+        
+
+        
+
     // Delay before switching to Accueil scene
-    this.time.delayedCall(4000, () => {
-      this.scene.start("Accueil");
+    this.time.delayedCall(2000, () => {
+      this.scene.start("Victoire");
       this.endingTriggered = false; // ✅ Reset flag when changing scene
     });
   }
@@ -1294,6 +1337,10 @@ class Jeu extends Phaser.Scene {
         this.player.anims.play("player_death", true);
         this.walkSound.stop();
 
+        this.rubisSound.stop(); // Stop sound when too far
+        
+        
+
         this.player.isInvulnerable = true; // Empêche d'autres interactions
 
         this.enemies.getChildren().forEach(enemy => {
@@ -1303,10 +1350,10 @@ class Jeu extends Phaser.Scene {
         });
 
         // 🖥️ Start fade-out effect when player dies
-        this.cameras.main.fadeOut(5000, 0, 0, 0); // 1000ms duration, black fade
+        this.cameras.main.fadeOut(3000, 0, 0, 0); // 1000ms duration, black fade
 
-        this.time.delayedCall(5000, () => { // ⏳ 5 secondes d'invulnérabilité après la mortd
-          this.scene.start("Accueil"); // Redémarrage après 5s
+        this.time.delayedCall(3000, () => { // ⏳ 5 secondes d'invulnérabilité après la mortd
+          this.scene.start("Mort"); // Redémarrage après 5s
         });
       }
 
@@ -1447,10 +1494,8 @@ class Jeu extends Phaser.Scene {
 
       // Ensure a walk sound variable exists
       if (!this.walkSound) {
-        this.walkSound = this.sound.add("walkSound", {
-          loop: true,
-          volume: 0.6,
-        });
+        playRandomWalkingSound();
+        
       }
 
       // Handle movement (Allowing movement both on the ground and in the air)
@@ -1501,11 +1546,7 @@ class Jeu extends Phaser.Scene {
       */
 
       // JUMP LOGIC (SINGLE & DOUBLE JUMP)
-            this.jumpSoundList = [];
 
-            for(let i = 1; i <= 10; i++) {
-              this.jumpSoundList.push(this.sound.add(`jumpSound_${i}`));
-            }
 
       if (this.jump) {
         if (this.player.body.blocked.down) {
@@ -1532,11 +1573,7 @@ class Jeu extends Phaser.Scene {
       // LAND
       // ------------------------------------------------------
 
-      this.landingSoundList = [];
 
-      for (let i = 1; i <= 10; i++) {
-        this.landingSoundList.push(this.sound.add(`atterissage_${i}`))
-      }
 
       // Track if the player was in the air before landing
       if (!this.player.body.blocked.down && this.player.body.velocity.y > 200) {
@@ -1581,14 +1618,19 @@ class Jeu extends Phaser.Scene {
         if(this.textNpcAnimationComplete == true){
           this.displayNpcText();
         }
-      } else {
+      }else 
+      if(this.physics.overlap(this.player, this.rubisGroup)){
+
+      }
+       else {
         console.log("Attack triggered");
         this.canAttack = false; // Prevent attacking again immediately
         this.isAttacking = true; // Set attack flag
 
-        this.sound.play("attackSound", {
-          volume: 1.5
-        }); // Adjust volume if needed
+        //this.sound.play("attackSound", {
+          //volume: 1.5
+        //}); // Adjust volume if needed
+        this.playRandomSwordSound();
         this.player.setVelocityX(0); // Stop movement during attack
 
         // Reset attack ability after cooldown
@@ -1772,12 +1814,18 @@ class Jeu extends Phaser.Scene {
   playRandomJumpSound() {
     //let = randomJumpIndex = Phaser.Math.Between(0, this.jumpSoundList.length - 1);
     this.jumpSoundList[Phaser.Math.Between(0, this.jumpSoundList.length - 1)].play();
-
-    
   }
 
   playRandomLandingSound(){
     this.landingSoundList[Phaser.Math.Between(0, this.landingSoundList.length - 1)].play();
+  }
+
+  playRandomSwordSound() {
+    this.swordSoundList[Phaser.Math.Between(0, this.swordSoundList.length - 1)].play();
+  }
+
+  playRandomWalkingSound(){
+    this.walkingSoundList[Phaser.Math.Between(0, this.walkingSoundList.length - 1)].play();
   }
 
 
