@@ -27,8 +27,8 @@ class Victoire extends Phaser.Scene {
 
         
     // Check if menu music is playing, pause it if so
-    if (backgroundMusic && backgroundMusic.isPlaying) {
-        backgroundMusic.pause();
+    if (gameMusic && gameMusic.isPlaying) {
+        gameMusic.pause();
       }
       
       this.time.delayedCall(250, () => {
