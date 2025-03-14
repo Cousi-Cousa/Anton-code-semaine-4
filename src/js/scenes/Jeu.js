@@ -500,7 +500,7 @@ class Jeu extends Phaser.Scene {
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
 
     // Create the Player
-    this.player = this.physics.add.sprite(2000, 284, "player_idle");
+    this.player = this.physics.add.sprite(100, 584, "player_idle");
     this.player
       .setBounce(0.1)
       .setCollideWorldBounds(true)
