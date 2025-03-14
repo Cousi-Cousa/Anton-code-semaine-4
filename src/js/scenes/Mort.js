@@ -5,6 +5,8 @@ class Mort extends Phaser.Scene {
 
     preload() {
         this.load.image("deathBanner", "./images/mort.png");
+        this.load.image("deathBanner2", "./images/revenir_mort.png");
+
     }
 
     create() {
@@ -13,6 +15,7 @@ class Mort extends Phaser.Scene {
         this.cameras.main.fadeIn(2000); // 500ms fade-in effect
 
         this.add.image(960, 540, 'deathBanner').setScale(1.3);
+        this.add.image(960, 840, 'deathBanner2').setScale(1.3);
 
         // Delay before switching to Accueil scene
 

@@ -79,7 +79,7 @@ class Accueil extends Phaser.Scene {
 
         // Play background music
         if (!backgroundMusic) {
-            backgroundMusic = this.sound.add('menuMusic', { volume: 0.02, loop: true });
+            backgroundMusic = this.sound.add('menuMusic', { volume: 0.2, loop: true });
             backgroundMusic.play();
         } else if (backgroundMusic.isPaused) {
             backgroundMusic.resume();

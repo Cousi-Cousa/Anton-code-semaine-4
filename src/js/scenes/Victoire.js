@@ -5,6 +5,7 @@ class Victoire extends Phaser.Scene {
 
     preload() {
         this.load.image("victoryBanner", "./images/victoire.png");
+        this.load.image("victoryBanner2", "./images/revenir_victoire.png");
 
         this.load.audio('clickSound', './Sounds/interaction_menu/interaction.wav')
     }
@@ -19,6 +20,7 @@ class Victoire extends Phaser.Scene {
         this.cameras.main.fadeIn(2000); // 500ms fade-in effect
 
         this.add.image(960, 540, 'victoryBanner').setScale(1.3);
+        this.add.image(960, 840, 'victoryBanner2').setScale(1.3);
 
         // Delay before switching to Accueil scene
 

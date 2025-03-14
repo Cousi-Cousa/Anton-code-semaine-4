@@ -415,7 +415,7 @@ class Jeu extends Phaser.Scene {
 
     // Play g0me-specific music only if not already playing
     if (!gameMusic) {
-      gameMusic = this.sound.add("gameMusic", { volume: 0.03, loop: true });
+      gameMusic = this.sound.add("gameMusic", { volume: 0.06, loop: true });
       gameMusic.play();
     }
 
@@ -430,7 +430,7 @@ class Jeu extends Phaser.Scene {
     console.log("CREATING");
     // Debugging (Hidden by Default)
     this.debugGraphics = this.add.graphics().setVisible(true);
-    this.physics.world.createDebugGraphic().setVisible(true);
+    this.physics.world.createDebugGraphic().setVisible(false);
 
     // Load Tilemap
     const map = this.make.tilemap({
@@ -1301,7 +1301,7 @@ class Jeu extends Phaser.Scene {
       // Restore HP one by one, but not beyond max HP (5)
       player.hp++;
       this.updateHealthBar();
-      this.playRandomhealthUpSound();
+      this.playRandomhealthUpSound(0.4);
       // Play potion pickup sound
     }
   }
@@ -1327,7 +1327,7 @@ class Jeu extends Phaser.Scene {
 
   collectQuestItem(player, item) {
     // ✅ Play quest pickup sound effect
-    this.playRandomParcheminSound();
+    this.playRandomParcheminSound(0.1);
 
     item.destroy(); // Remove the item
     this.collectedQuestItems++; // Increment collected count
@@ -1379,7 +1379,7 @@ class Jeu extends Phaser.Scene {
       console.log(`Player HP: ${player.hp}`);
 
       // ✅ Play damage sound effect
-      this.playRandomhealthLostSound()
+      this.playRandomhealthLostSound(0.2)
 
       // ✅ Stop all animations and enforce the hit sprite
       player.play("player_hit", true);
@@ -1459,15 +1459,15 @@ class Jeu extends Phaser.Scene {
     if (!enemy.isHit) {
       enemy.hp--; // Reduce enemy HP
       enemy.isHit = true; // Prevent rapid damage
-      this.playRandomWoundedMushroomSound();
+      this.playRandomWoundedMushroomSound(0.2);
 
       console.log(`Enemy HP: ${enemy.hp}`);
 
       // ✅ If the enemy is already dead, do nothing
       if (enemy.hp <= 0 && !enemy.isDead) {
         enemy.isDead = true;
-        this.playRandomDyingMushroomSound();
-        this.playRandomImpactMushSound() 
+        this.playRandomDyingMushroomSound(0.001);
+        this.playRandomImpactMushSound(0.1) 
         
         console.log("Enemy dies");
 
@@ -1607,7 +1607,7 @@ class Jeu extends Phaser.Scene {
             this.player.play("run", true);
     
             if (!this.walkSound || !this.walkSound.isPlaying) {
-                this.playRandomWalkingSound(); 
+                this.playRandomWalkingSound(0.2); 
             }
         }
     } else {
@@ -1652,7 +1652,7 @@ class Jeu extends Phaser.Scene {
           // ✅ Normal Jump from Ground
           this.player.setVelocityY(-340);
           this.player.play("jump", true);
-          this.playRandomJumpSound();
+          this.playRandomJumpSound(0.2);
 
           this.canDoubleJump = true; // Allow double jump
           this.hasDoubleJumped = false; // Reset double jump flag
@@ -1663,7 +1663,7 @@ class Jeu extends Phaser.Scene {
           //this.sound.play("jumpSound", {
           //  volume: 1.2
           //}); // Lower volume for second jump
-          this.playRandomJumpSound();
+          this.playRandomJumpSound(0.2);
 
           this.hasDoubleJumped = true; // Mark that double jump was used
         }
@@ -1683,7 +1683,7 @@ class Jeu extends Phaser.Scene {
       if (this.wasInAir && this.player.body.blocked.down) {
         if (!this.landedRecently) {
           // Prevent multiple triggers
-          this.playRandomLandingSound();
+          this.playRandomLandingSound(0.1);
           this.landedRecently = true;
 
           // Reset the flag after a short delay
@@ -1729,7 +1729,7 @@ class Jeu extends Phaser.Scene {
         //this.sound.play("attackSound", {
           //volume: 1.5
         //}); // Adjust volume if needed
-        this.playRandomSwordSound();
+        this.playRandomSwordSound(1);
         this.player.setVelocityX(0); // Stop movement during attack
 
         // Reset attack ability after cooldown
@@ -1850,7 +1850,7 @@ class Jeu extends Phaser.Scene {
           enemy.isAttacking = true;
           enemy.play("enemy_attack", true);
           this.sound.play("mushroomAttack", {
-            volume: 3
+            volume: 0.1
           });
 
           enemy.flipX = this.player.x > enemy.x;
@@ -1910,54 +1910,165 @@ class Jeu extends Phaser.Scene {
 
 
   //fonction de sauts aléatoires
-  playRandomJumpSound() {
-    //let = randomJumpIndex = Phaser.Math.Between(0, this.jumpSoundList.length - 1);
-    this.jumpSoundList[Phaser.Math.Between(0, this.jumpSoundList.length - 1)].play();
+  playRandomJumpSound(volume = 1) { 
+    if (this.jumpSoundList.length === 0) {
+      console.error('No jump sounds available!');
+      return; // Exit if the sound list is empty
+    }
+    
+    let randomJumpIndex = Phaser.Math.Between(0, this.jumpSoundList.length - 1); // Generate random index
+    
+    let sound = this.jumpSoundList[randomJumpIndex];
+    
+    if (!sound) {
+      console.error('Sound at index ' + randomJumpIndex + ' is undefined');
+      return; // Exit if the sound at the random index is undefined
+    }
+  
+    sound.volume = volume; // Set volume
+    sound.play(); // Play sound
   }
 
-  playRandomLandingSound(){
-    this.landingSoundList[Phaser.Math.Between(0, this.landingSoundList.length - 1)].play();
-  }
-
-  playRandomSwordSound() {
-    this.swordSoundList[Phaser.Math.Between(0, this.swordSoundList.length - 1)].play();
-  }
-
-  playRandomWalkingSound(){
-    if (this.walkSound && this.walkSound.isPlaying) {
-        this.walkSound.stop(); // Stop the previous sound if it's playing
+  playRandomLandingSound(volume = 1){
+    if (this.landingSoundList.length === 0) {
+      console.error('No jump sounds available!');
+      return; // Exit if the sound list is empty
     }
 
-    // ✅ Stocke l'instance dans `this.walkSound` au lieu du résultat de `play()`
+    let randomLandingIndex = Phaser.Math.Between(0, this.landingSoundList.length - 1);
+
+    let sound = this.landingSoundList[randomLandingIndex];
+
+    sound.volume = volume; // Set volume
+    sound.play(); // Play sound
+  }
+
+  playRandomSwordSound(volume = 1) {
+    if (this.swordSoundList.length === 0) {
+      console.error('No jump sounds available!');
+      return; // Exit if the sound list is empty
+    }
+
+    let randomSwordIndex = Phaser.Math.Between(0, this.swordSoundList.length - 1);
+
+    let sound = this.swordSoundList[randomSwordIndex];
+
+    sound.volume = volume; // Set volume
+    sound.play(); // Play sound
+  }
+
+  playRandomWalkingSound(volume = 1) {
+    // Vérifie si la liste de sons est vide
+    if (this.walkingSoundList.length === 0) {
+      console.error('Aucun son de marche disponible!');
+      return; // Quitte la fonction si la liste est vide
+    }
+  
+    // Vérifie si un son est déjà en train de jouer, et l'arrête si nécessaire
+    if (this.walkSound && this.walkSound.isPlaying) {
+      this.walkSound.stop(); // Stoppe le son précédent s'il est en train de jouer
+    }
+  
+    // Sélectionne un son aléatoire de la liste
     this.walkSound = this.walkingSoundList[Phaser.Math.Between(0, this.walkingSoundList.length - 1)];
-    this.walkSound.play(); // ✅ Joue le son séparément
+  
+    // Vérifie que le son sélectionné est valide
+    if (!this.walkSound) {
+      console.error('Le son sélectionné est indéfini.');
+      return; // Quitte si le son est indéfini
+    }
+  
+    // Applique le volume et joue le son
+    this.walkSound.volume = volume;
+    this.walkSound.play(); // Joue le son
   }
 
-  playRandomhealthLostSound() {
-    this.healthLostSoundList[Phaser.Math.Between(0, this.healthLostSoundList.length - 1)].play();
+  playRandomhealthLostSound(volume = 1) {
+    if (this.healthLostSoundList.length === 0) {
+      console.error('No jump sounds available!');
+      return; // Exit if the sound list is empty
+    }
+
+    let randomHealthLostIndex = Phaser.Math.Between(0, this.healthLostSoundList.length - 1);
+
+    let sound = this.healthLostSoundList[randomHealthLostIndex];
+
+    sound.volume = volume; // Set volume
+    sound.play(); // Play sound
   }
 
-  playRandomhealthUpSound() {
-    this.healthUpSoundList[Phaser.Math.Between(0, this.healthUpSoundList.length - 1)].play();
+  playRandomhealthUpSound(volume = 1) {
+    if (this.healthUpSoundList.length === 0) {
+      console.error('No jump sounds available!');
+      return; // Exit if the sound list is empty
+    }
+
+    let randomHealthUpIndex = Phaser.Math.Between(0, this.healthUpSoundList.length - 1);
+
+    let sound = this.healthUpSoundList[randomHealthUpIndex];
+
+    sound.volume = volume; // Set volume
+    sound.play(); // Play sound
   }
 
-  playRandomWoundedMushroomSound() {
-    this.woundedMushroomSoundList[Phaser.Math.Between(0, this.woundedMushroomSoundList.length - 1)].play();
+  playRandomWoundedMushroomSound(volume = 1) {
+    if (this.woundedMushroomSoundList.length === 0) {
+      console.error('No jump sounds available!');
+      return; // Exit if the sound list is empty
+    }
+
+    let randomWoundedMushroomIndex = Phaser.Math.Between(0, this.woundedMushroomSoundList.length - 1);
+
+    let sound = this.woundedMushroomSoundList[randomWoundedMushroomIndex];
+
+    sound.volume = volume; // Set volume
+    sound.play(); // Play sound
   }
 
-  playRandomDyingMushroomSound() {
-    this.dyingMushroomSoundList[Phaser.Math.Between(0, this.dyingMushroomSoundList.length - 1)].play();
+  playRandomDyingMushroomSound(volume = 1) {
+    if (this.dyingMushroomSoundList.length === 0) {
+      console.error('No jump sounds available!');
+      return; // Exit if the sound list is empty
+    }
+
+    let randomDyingMushroomIndex = Phaser.Math.Between(0, this.dyingMushroomSoundList.length - 1);
+
+    let sound = this.dyingMushroomSoundList[randomDyingMushroomIndex];
+
+    sound.volume = volume; // Set volume
+    sound.play(); // Play sound
   }
 
-  playRandomImpactMushSound() {
-    this.impactMushSoundList[Phaser.Math.Between(0, this.impactMushSoundList.length - 1)].play();
+  playRandomImpactMushSound(volume = 1) {
+    if (this.impactMushSoundList.length === 0) {
+      console.error('No jump sounds available!');
+      return; // Exit if the sound list is empty
+    }
+
+    let randomImpactMushSoundIndex = Phaser.Math.Between(0, this.impactMushSoundList.length - 1);
+
+    let sound = this.impactMushSoundList[randomImpactMushSoundIndex];
+
+    sound.volume = volume; // Set volume
+    sound.play(); // Play sound
   }
 
-  playRandomParcheminSound() {
-    this.parcheminSoundList[Phaser.Math.Between(0, this.parcheminSoundList.length - 1)].play();
+  playRandomParcheminSound(volume = 1) {
+    if (this.parcheminSoundList.length === 0) {
+      console.error('No jump sounds available!');
+      return; // Exit if the sound list is empty
+    }
+
+    let randomParcheminSoundIndex = Phaser.Math.Between(0, this.parcheminSoundList.length - 1);
+
+    let sound = this.parcheminSoundList[randomParcheminSoundIndex];
+
+    sound.volume = volume; // Set volume
+    sound.play(); // Play sound
+  
   }
 
-  playRandomSlimeSound(slime) {
+  playRandomSlimeSound(slime,volume = 1) {
     // Si le slime a déjà un son en cours, on n'en joue pas un autre
     if (slime.currentSound && slime.currentSound.isPlaying) {
         return;
@@ -2008,7 +2119,7 @@ class Jeu extends Phaser.Scene {
       let minDistance = 50; // Closest distance for full volume
 
       // Calculate volume based on distance
-      let volume = Phaser.Math.Clamp(1 - (distance - minDistance) / (maxDistance - minDistance), 0, 1);
+      let volume = Phaser.Math.Clamp(1 - (distance - minDistance) / (maxDistance - minDistance), 0, 0.3);
 
       if (volume > 0) {
         if (!this.rubisSoundPlaying) {
