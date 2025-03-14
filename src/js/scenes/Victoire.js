@@ -8,10 +8,13 @@ class Victoire extends Phaser.Scene {
         this.load.image("victoryBanner2", "./images/revenir_victoire.png");
 
         this.load.audio('clickSound', './Sounds/interaction_menu/interaction.wav')
+
+        this.load.audio('victorySound', './Sounds/musique_victoire.wav')
     }
 
     create() {
         this.clickSound = this.sound.add('clickSound');
+        this.victorySound = this.sound.add('victorySound');
 
 
         this.cameras.main.setBackgroundColor('#FAF0E7');
@@ -21,6 +24,19 @@ class Victoire extends Phaser.Scene {
 
         this.add.image(960, 540, 'victoryBanner').setScale(1.3);
         this.add.image(960, 840, 'victoryBanner2').setScale(1.3);
+
+        
+    // Check if menu music is playing, pause it if so
+    if (backgroundMusic && backgroundMusic.isPlaying) {
+        backgroundMusic.pause();
+      }
+      
+      this.time.delayedCall(250, () => {
+        this.victorySound.play({
+            volume: 0.4
+        });
+    });
+     
 
         // Delay before switching to Accueil scene
 
