@@ -1429,6 +1429,8 @@ class Jeu extends Phaser.Scene {
         this.player.isDead = true;
         this.player.setVelocity(0); // Empêcher tout mouvement
         this.player.anims.play("player_death", true);
+
+        
         this.walkSound.stop();
 
         this.rubisSound.stop(); // Stop sound when too far
@@ -1824,6 +1826,7 @@ class Jeu extends Phaser.Scene {
       this.enemies.children.iterate((enemy) => {
         enemy.setVelocityX(0);
         enemy.play("enemy_idle", true);
+
       });
       return; // Sortir de la fonction pour empêcher tout autre comportement
     }
