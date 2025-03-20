@@ -1731,7 +1731,7 @@ class Jeu extends Phaser.Scene {
         //this.sound.play("attackSound", {
           //volume: 1.5
         //}); // Adjust volume if needed
-        this.playRandomSwordSound(1);
+        this.playRandomSwordSound(0.7);
         this.player.setVelocityX(0); // Stop movement during attack
 
         // Reset attack ability after cooldown
